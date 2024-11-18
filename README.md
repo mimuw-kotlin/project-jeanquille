@@ -23,5 +23,4 @@ In the first part we're going to implement backend.
 In the second part we're going to implement frontend.
 
 ## Libraries
-- Lombok
-- *and more...*
+- *to be added*
