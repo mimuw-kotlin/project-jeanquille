@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping(path=["test"])
+@RequestMapping("/test")
 class TestController(val service: TestService) {
     @GetMapping
     fun xddd(): MutableList<TestModel> {
