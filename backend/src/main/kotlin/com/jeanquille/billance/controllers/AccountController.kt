@@ -1,5 +1,6 @@
 package com.jeanquille.billance.controllers
 
+import com.jeanquille.billance.dto.AccountPostDto
 import com.jeanquille.billance.models.Account
 import com.jeanquille.billance.services.AccountService
 import org.springframework.web.bind.annotation.GetMapping
@@ -13,9 +14,16 @@ class AccountController(private val accountService: AccountService) {
     @GetMapping("/accounts")
     fun getAllAccounts(): MutableList<Account> = accountService.getAllAccounts()
 
-    //TEST
-    @PostMapping("/account/{username}")
-    fun createAccount(@PathVariable username: String): Account {
-        return accountService.createAccount(username)
+//    @PostMapping("/account/{username}")
+//    fun createAccount(@PathVariable username: String): Account {
+//        return accountService.createAccount(username)
+//    }
+
+    @GetMapping("/account/{accountId}")
+    fun getAccount(@PathVariable accountId: Long): Account = accountService.getAccount(accountId)
+
+    @PostMapping("/account")
+    fun createAccount(accountPostDto: AccountPostDto) {
+        accountService.createAccount(accountPostDto.toAccount())
     }
 }

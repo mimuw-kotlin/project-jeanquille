@@ -24,10 +24,10 @@ class Account (
     @ManyToMany
     var friends: MutableList<Account>,
     ) {
-    constructor(username: String) : this(
+    constructor(username: String, password: String, phoneNumber: String?) : this(
         username = username,
-        password = "",
-        phoneNumber = "",
+        password = password,
+        phoneNumber = phoneNumber ?: "",
         memberships = mutableListOf(),
         transactionsAsPayer = mutableListOf(),
         transactionsAsReceiver = mutableListOf(),
