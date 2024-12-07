@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 class AccountController(private val accountService: AccountService) {
@@ -20,7 +21,7 @@ class AccountController(private val accountService: AccountService) {
 //    }
 
     @GetMapping("/account/{accountId}")
-    fun getAccount(@PathVariable accountId: Long): Account = accountService.getAccount(accountId)
+    fun getAccount(@PathVariable accountId: UUID): Account = accountService.getAccount(accountId)
 
     @PostMapping("/account")
     fun createAccount(accountPostDto: AccountPostDto) {

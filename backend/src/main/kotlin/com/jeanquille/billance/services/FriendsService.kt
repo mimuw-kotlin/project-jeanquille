@@ -5,15 +5,16 @@ import com.jeanquille.billance.repositories.AccountRepository
 import com.jeanquille.billance.utils.addFriend
 import com.jeanquille.billance.utils.removeFriend
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class FriendsService(private val accountRepository: AccountRepository) {
-    fun getFriends(accountId: Long): MutableList<Account> {
+    fun getFriends(accountId: UUID): MutableList<Account> {
         val account: Account = accountRepository.findById(accountId).orElseThrow()
         return account.friends
     }
 
-    fun unfriend(accountId: Long, friendId: Long) {
+    fun unfriend(accountId: UUID, friendId: UUID) {
         val account: Account = accountRepository.findById(accountId).orElseThrow()
         val friend: Account = accountRepository.findById(friendId).orElseThrow()
 
@@ -22,7 +23,7 @@ class FriendsService(private val accountRepository: AccountRepository) {
         accountRepository.saveAll(mutableListOf(account, friend))
     }
 
-    fun addFriend(accountId: Long, friendId: Long) {
+    fun addFriend(accountId: UUID, friendId: UUID) {
         val account: Account = accountRepository.findById(accountId).orElseThrow()
         val friend: Account = accountRepository.findById(friendId).orElseThrow()
 
