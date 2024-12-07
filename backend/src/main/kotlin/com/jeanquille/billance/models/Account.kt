@@ -1,12 +1,13 @@
 package com.jeanquille.billance.models
 
 import jakarta.persistence.*
+import java.util.UUID
 
 @Entity
 class Account (
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    var id: Long? = null,
+    var id: UUID? = null,
     var username: String,
     var password: String,
     var phoneNumber: String,
