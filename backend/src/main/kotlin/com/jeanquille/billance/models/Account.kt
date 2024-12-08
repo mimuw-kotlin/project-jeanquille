@@ -8,29 +8,22 @@ class Account (
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     var id: UUID? = null,
-    var username: String,
-    var password: String,
-    var phoneNumber: String,
-
-    @OneToMany(mappedBy = "account")
-    var memberships: MutableList<Member>,
+    var username: String = "",
+    var password: String = "",
+    var phoneNumber: String = "",
 
     @OneToMany(mappedBy = "payer")
-    var transactionsAsPayer: MutableList<Transaction>,
+    var transactionsAsPayer: MutableList<Transaction> = mutableListOf(),
 
     @OneToMany(mappedBy = "receiver")
-    var transactionsAsReceiver: MutableList<Transaction>,
+    var transactionsAsReceiver: MutableList<Transaction> = mutableListOf(),
 
     @ManyToMany
-    var friends: MutableList<Account>,
+    var friends: MutableList<Account> = mutableListOf()
     ) {
     constructor(username: String, password: String, phoneNumber: String?) : this(
         username = username,
         password = password,
         phoneNumber = phoneNumber ?: "",
-        memberships = mutableListOf(),
-        transactionsAsPayer = mutableListOf(),
-        transactionsAsReceiver = mutableListOf(),
-        friends = mutableListOf()
     )
 }

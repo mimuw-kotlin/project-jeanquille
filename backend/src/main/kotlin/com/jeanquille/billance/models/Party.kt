@@ -1,5 +1,6 @@
 package com.jeanquille.billance.models
 
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -9,17 +10,17 @@ class Party (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
-    var name: String,
+    var name: String = "New Party",
 
-    var date: LocalDateTime,
+    var creationDate: LocalDateTime = LocalDateTime.now(),
 
     @OneToMany(mappedBy = "party", cascade = [CascadeType.ALL], orphanRemoval = true)
     @JsonManagedReference
     var members: MutableList<Member> = mutableListOf(),
 
-    @OneToMany(mappedBy = "party")
-    var transactions: MutableList<Transaction>,
+    @OneToMany(mappedBy = "party", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var transactions: MutableList<Transaction> = mutableListOf(),
 
-    @OneToMany(mappedBy = "party")
-    var bills: MutableList<Bill>
+    @OneToMany(mappedBy = "party", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var bills: MutableList<Bill> = mutableListOf()
 )

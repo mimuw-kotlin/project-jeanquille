@@ -16,10 +16,10 @@ class Bill (
     var date: LocalDateTime = LocalDateTime.now(),
 
     @ManyToOne
-    var party: Party,
+    var party: Party = Party(),
 
     @ManyToOne
-    var payer: Account,
+    var payer: Account = Account(),
 
     @ManyToMany
     var participants: MutableList<Account>

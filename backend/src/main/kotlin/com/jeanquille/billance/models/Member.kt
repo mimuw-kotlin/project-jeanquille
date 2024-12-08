@@ -1,5 +1,6 @@
 package com.jeanquille.billance.models
 
+import com.fasterxml.jackson.annotation.JsonBackReference
 import jakarta.persistence.*
 
 @Entity
@@ -14,6 +15,7 @@ class Member (
 
     @JoinColumn(name = "party_id")
     @ManyToOne
+    @JsonBackReference
     var party: Party,
 
     var balance: Long = 0

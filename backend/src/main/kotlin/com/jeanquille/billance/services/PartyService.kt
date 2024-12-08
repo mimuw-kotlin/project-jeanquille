@@ -4,6 +4,7 @@ import com.jeanquille.billance.models.Account
 import com.jeanquille.billance.models.Bill
 import com.jeanquille.billance.models.Member
 import com.jeanquille.billance.models.Party
+import com.jeanquille.billance.repositories.MemberRepository
 import com.jeanquille.billance.repositories.PartyRepository
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -12,7 +13,7 @@ import java.util.UUID
 import kotlin.math.ceil
 
 @Service
-class PartyService(val partyRepository: PartyRepository) {
+class PartyService(private val partyRepository: PartyRepository, private val memberRepository: MemberRepository) {
     fun getAllParties(): MutableList<Party> {
         return partyRepository.findAll()
     }
@@ -25,9 +26,8 @@ class PartyService(val partyRepository: PartyRepository) {
         return partyRepository.findById(partyId).orElseThrow()
     }
 
-    fun createParty(party: Party, creator: Account): Party {
-        val member = Member()
-        member.account.id = creator.id
+    fun createParty(party: Party, creatorId: UUID): Party {
+        val member = Member(party=party, account=Account(id=creatorId))
         party.members.add(member)
 
         return partyRepository.save(party)
@@ -48,10 +48,8 @@ class PartyService(val partyRepository: PartyRepository) {
         if (party.members.any { it.account.id == accountId }) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "Account is already a member of this party")
         }
-        val member = Member()
-        member.account.id = accountId
+        val member = Member(party=party, account=Account(id=accountId))
         party.members.add(member)
-
         return partyRepository.save(party)
     }
 
