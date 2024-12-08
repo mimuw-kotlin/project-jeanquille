@@ -54,12 +54,16 @@ class PartyService(private val partyRepository: PartyRepository, private val mem
     }
 
     fun addBill(bill: Bill): Party {
+        val party = partyRepository.findById(bill.party.id!!).orElseThrow()
+        party.bills.add(bill)
+        return partyRepository.save(party)
+        //TODO: Implement further
         val n: Int = bill.participants.size
         val amountPerPerson: Long = ceil(bill.amount.toDouble() / n).toLong()
         val totalAmount: Long = amountPerPerson * n
         bill.amount = totalAmount
 
         val partyMembers: MutableList<Member> = memberRepository.findByPartyId(bill.party.id!!)
-        return Party() //TODO: Implement further
+        return Party()
     }
 }

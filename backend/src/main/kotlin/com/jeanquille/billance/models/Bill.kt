@@ -1,5 +1,6 @@
 package com.jeanquille.billance.models
 
+import com.fasterxml.jackson.annotation.JsonBackReference
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -16,6 +17,7 @@ class Bill (
     var date: LocalDateTime = LocalDateTime.now(),
 
     @ManyToOne
+    @JsonBackReference
     var party: Party = Party(),
 
     @ManyToOne

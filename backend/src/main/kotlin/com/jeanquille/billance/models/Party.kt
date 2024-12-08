@@ -22,5 +22,6 @@ class Party (
     var transactions: MutableList<Transaction> = mutableListOf(),
 
     @OneToMany(mappedBy = "party", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JsonManagedReference
     var bills: MutableList<Bill> = mutableListOf()
 )
