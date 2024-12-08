@@ -13,7 +13,7 @@ class Bill (
 
     var amount: Long,
 
-    var date: LocalDateTime,
+    var date: LocalDateTime = LocalDateTime.now(),
 
     @ManyToOne
     var party: Party,

@@ -8,7 +8,7 @@ class Transaction (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
-    var amount: Long,
+    var amount: Long = 0,
 
     @JoinColumn(name = "party_id")
     @ManyToOne

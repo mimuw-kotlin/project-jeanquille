@@ -13,4 +13,18 @@ class BillService(val billRepository: BillRepository) {
     fun getBillsInParty(partyId: Long): MutableList<Bill> {
         return billRepository.findByPartyId(partyId)
     }
+
+    fun deleteBill(billId: Long) {
+        billRepository.deleteById(billId)
+    }
+
+    fun updateBill(billId: Long, newBill: Bill) {
+        val billToUpdate: Bill = billRepository.findById(billId).orElseThrow()
+        billToUpdate.amount = newBill.amount
+        billToUpdate.date = newBill.date
+        billToUpdate.name = newBill.name
+        billRepository.save(billToUpdate)
+    }
+
+    fun getBill(billId: Long): Bill = billRepository.findById(billId).orElseThrow()
 }

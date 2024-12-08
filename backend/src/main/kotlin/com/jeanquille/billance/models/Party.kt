@@ -13,8 +13,9 @@ class Party (
 
     var date: LocalDateTime,
 
-    @OneToMany(mappedBy = "party")
-    var members: MutableList<Member>,
+    @OneToMany(mappedBy = "party", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JsonManagedReference
+    var members: MutableList<Member> = mutableListOf(),
 
     @OneToMany(mappedBy = "party")
     var transactions: MutableList<Transaction>,

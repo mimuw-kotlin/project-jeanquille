@@ -1,6 +1,7 @@
 package com.jeanquille.billance.services
 
 import com.jeanquille.billance.models.Account
+import com.jeanquille.billance.models.Bill
 import com.jeanquille.billance.models.Member
 import com.jeanquille.billance.models.Party
 import com.jeanquille.billance.repositories.PartyRepository
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import java.util.UUID
+import kotlin.math.ceil
 
 @Service
 class PartyService(val partyRepository: PartyRepository) {
@@ -51,5 +53,15 @@ class PartyService(val partyRepository: PartyRepository) {
         party.members.add(member)
 
         return partyRepository.save(party)
+    }
+
+    fun addBill(bill: Bill): Party {
+        val n: Int = bill.participants.size
+        val amountPerPerson: Long = ceil(bill.amount.toDouble() / n).toLong()
+        val totalAmount: Long = amountPerPerson * n
+        bill.amount = totalAmount
+
+        val partyMembers: MutableList<Member> = memberRepository.findByPartyId(bill.party.id!!)
+        return Party() //TODO: Implement further
     }
 }
