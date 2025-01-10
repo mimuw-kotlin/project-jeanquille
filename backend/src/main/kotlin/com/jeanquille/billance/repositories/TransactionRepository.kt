@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface TransactionRepository: JpaRepository<Transaction, Long> {
-    fun findByPartyId(partyId: Long): MutableList<Transaction>
+    fun findAllByPartyId(partyId: Long): MutableList<Transaction>
+    fun deleteByPartyId(partyId: Long)
 }

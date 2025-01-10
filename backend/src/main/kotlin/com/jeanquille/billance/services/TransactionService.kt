@@ -7,6 +7,6 @@ import org.springframework.stereotype.Service
 @Service
 class TransactionService(val transactionRepository: TransactionRepository) {
     fun getTransactionsInParty(partyId: Long): MutableList<Transaction> {
-        return transactionRepository.findByPartyId(partyId)
+        return transactionRepository.findAllByPartyId(partyId)
     }
 }

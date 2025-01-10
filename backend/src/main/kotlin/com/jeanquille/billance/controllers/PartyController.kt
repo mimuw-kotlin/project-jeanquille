@@ -1,11 +1,10 @@
 package com.jeanquille.billance.controllers
 
 import com.jeanquille.billance.dto.BillDto
-import com.jeanquille.billance.models.Bill
 import com.jeanquille.billance.models.Party
+import com.jeanquille.billance.models.Transaction
 import com.jeanquille.billance.services.PartyService
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDateTime
 import java.util.*
 
 
@@ -46,5 +45,10 @@ class PartyController (private val partyService: PartyService) {
     @PostMapping("/party/{partyId}/bill")
     fun addBill(@PathVariable partyId: Long, @RequestBody billDto: BillDto): Party {
         return partyService.addBill(billDto.toBill(partyId))
+    }
+
+    @PostMapping("/party/{partyId}/sumup")
+    fun sumUp(@PathVariable partyId: Long): MutableList<Transaction> {
+        return partyService.sumUpParty(partyId)
     }
 }
