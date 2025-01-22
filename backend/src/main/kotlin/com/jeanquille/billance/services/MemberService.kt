@@ -7,6 +7,6 @@ import org.springframework.stereotype.Service
 @Service
 class MemberService(val memberRepository: MemberRepository) {
     fun getMembersInParty(partyId: Long): MutableList<Member> {
-        return memberRepository.findByPartyId(partyId)
+        return memberRepository.findAllByPartyId(partyId)
     }
 }
