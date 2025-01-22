@@ -4,57 +4,140 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 
 @Composable
 fun HomeScreen() {
-    Column {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .background(MaterialTheme.colors.background)
-                .fillMaxWidth()
-                .padding(16.dp)
+    var showLogoutDialog by remember { mutableStateOf(false) }
+    var showAddPartyDialog by remember { mutableStateOf(false) }
+    var showAddFriendDialog by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .wrapContentSize(Alignment.Center)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Text(
-                text = "Avamaco",
-                fontSize = 24.sp
-            )
-            IconButton(
-                onClick = {},
-                modifier = Modifier.background(MaterialTheme.colors.secondary, CircleShape)
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .background(MaterialTheme.colors.background)
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.ExitToApp,
-                    contentDescription = "Logout",
-                    tint = MaterialTheme.colors.primary
+                Text(
+                    text = "Avamaco",
+                    fontSize = 24.sp
                 )
+                IconButton(
+                    onClick = {showLogoutDialog = true},
+                    modifier = Modifier.background(MaterialTheme.colors.secondary, CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Default.ExitToApp,
+                        contentDescription = "Logout",
+                        tint = MaterialTheme.colors.primary
+                    )
+                }
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                Box(modifier = Modifier.weight(1f)) {
+                    PartiesList({ showAddPartyDialog = true })
+                }
+                Box(modifier = Modifier.weight(1f)) {
+                    FriendsList({ showAddFriendDialog = true })
+                }
             }
         }
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+        if (showLogoutDialog) {
+            LogoutDialog(onDismiss = { showLogoutDialog = false })
+        }
+        if (showAddPartyDialog) {
+            TextFieldDialog(
+                question = "Enter party name",
+                onAccept = { showAddPartyDialog = false },
+                onDismiss = { showAddPartyDialog = false }
+            )
+        }
+        if (showAddFriendDialog) {
+            TextFieldDialog(
+                question = "Enter friend name",
+                onAccept = { showAddFriendDialog = false },
+                onDismiss = { showAddFriendDialog = false }
+            )
+        }
+    }
+}
+
+@Composable
+fun LogoutDialog(onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
+                .wrapContentSize(Alignment.Center)
         ) {
-            Box(modifier = Modifier.weight(1f)) {
-                PartiesList()
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .background(color = MaterialTheme.colors.background, RoundedCornerShape(16.dp))
+                    .padding(16.dp)
+            ) {
+                Text(text = "Do you really want to log out?")
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = onDismiss) {
+                    Text("Log out")
+                }
+                Button(onClick = onDismiss) {
+                    Text("Cancel")
+                }
             }
-            Box(modifier = Modifier.weight(1f)) {
-                FriendsList()
+        }
+    }
+}
+
+@Composable
+fun TextFieldDialog(question: String, onAccept: () -> Unit, onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        var text by remember { mutableStateOf("") }
+        Box(
+            modifier = Modifier
+                .wrapContentSize(Alignment.Center)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .background(color = MaterialTheme.colors.background, RoundedCornerShape(16.dp))
+                    .padding(16.dp)
+            ) {
+                Text(text = question)
+                TextField(
+                    value = text,
+                    onValueChange = { text = it },
+                    label = { Text("Name") }
+                )
+                Button(onClick = onAccept) {
+                    Text("Accept")
+                }
+                Button(onClick = onDismiss) {
+                    Text("Cancel")
+                }
             }
         }
     }
@@ -118,7 +201,7 @@ fun PrettyListContent(content: List<@Composable () -> Unit>) {
 }
 
 @Composable
-fun PartiesList() {
+fun PartiesList(onButtonClick: () -> Unit) {
     val listOfParties = listOf<@Composable () -> Unit>(
         { Text("Party1")},
         { Text("Party2")},
@@ -130,13 +213,13 @@ fun PartiesList() {
             .padding(8.dp)
             .fillMaxWidth()
     ) {
-        ListHeader("Parties", "Add party") {}
+        ListHeader("Parties", "Add party", onButtonClick)
         PrettyListContent(listOfParties)
     }
 }
 
 @Composable
-fun FriendsList() {
+fun FriendsList(onButtonClick: () -> Unit) {
     val listOfFriends = listOf<@Composable () -> Unit>(
         { Text("Żonkil")},
         { Text("Mati")},
@@ -148,7 +231,7 @@ fun FriendsList() {
             .padding(8.dp)
             .fillMaxWidth()
     ) {
-        ListHeader("Friends", "Add friend") {}
+        ListHeader("Friends", "Add friend", onButtonClick)
         PrettyListContent(listOfFriends)
     }
 }
