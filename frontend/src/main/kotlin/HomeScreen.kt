@@ -144,7 +144,7 @@ fun TextFieldDialog(question: String, onAccept: () -> Unit, onDismiss: () -> Uni
 }
 
 @Composable
-fun ListHeader(name: String, buttonDescription: String, onButtonClick: () -> Unit) {
+fun ListHeader(name: String, showButton: Boolean, buttonDescription: String = "", onButtonClick: () -> Unit = {}) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -154,30 +154,18 @@ fun ListHeader(name: String, buttonDescription: String, onButtonClick: () -> Uni
             text = name,
             fontSize = 24.sp
         )
-        IconButton(
-            onClick = onButtonClick,
-            modifier = Modifier.background(MaterialTheme.colors.secondary, CircleShape)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = buttonDescription,
-                tint = MaterialTheme.colors.primary
-            )
+        if (showButton) {
+            IconButton(
+                onClick = onButtonClick,
+                modifier = Modifier.background(MaterialTheme.colors.secondary, CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = buttonDescription,
+                    tint = MaterialTheme.colors.primary
+                )
+            }
         }
-    }
-}
-
-@Composable
-fun ListHeader(name: String) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(16.dp).fillMaxWidth()
-    ) {
-        Text(
-            text = name,
-            fontSize = 24.sp
-        )
     }
 }
 
@@ -201,21 +189,30 @@ fun PrettyListContent(content: List<@Composable () -> Unit>) {
 }
 
 @Composable
-fun PartiesList(onButtonClick: () -> Unit) {
-    val listOfParties = listOf<@Composable () -> Unit>(
-        { Text("Party1")},
-        { Text("Party2")},
-        { Text("Party3")}
-    )
+fun PrettyList(name: String,
+               showButton: Boolean,
+               buttonDescription: String = "",
+               onButtonClick: () -> Unit = {},
+               content: List<@Composable () -> Unit>) {
     Column(
         modifier = Modifier
             .background(MaterialTheme.colors.background, RoundedCornerShape(16.dp))
             .padding(8.dp)
             .fillMaxWidth()
     ) {
-        ListHeader("Parties", "Add party", onButtonClick)
-        PrettyListContent(listOfParties)
+        ListHeader(name, showButton, buttonDescription, onButtonClick)
+        PrettyListContent(content)
     }
+}
+
+@Composable
+fun PartiesList(onButtonClick: () -> Unit) {
+    val listOfParties = listOf<@Composable () -> Unit>(
+        { Text("Party1")},
+        { Text("Party2")},
+        { Text("Party3")}
+    )
+    PrettyList("Parties", true, "Create party", onButtonClick, listOfParties)
 }
 
 @Composable
@@ -225,13 +222,5 @@ fun FriendsList(onButtonClick: () -> Unit) {
         { Text("Mati")},
         { Text("Kwiatek")}
     )
-    Column(
-        modifier = Modifier
-            .background(MaterialTheme.colors.background, RoundedCornerShape(16.dp))
-            .padding(8.dp)
-            .fillMaxWidth()
-    ) {
-        ListHeader("Friends", "Add friend", onButtonClick)
-        PrettyListContent(listOfFriends)
-    }
+    PrettyList("Friends", true, "Add friend", onButtonClick, listOfFriends)
 }

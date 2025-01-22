@@ -22,7 +22,8 @@ fun App() {
             background = Color(0xFFBADBED),
         )
     ) {
-        HomeScreen()
+//        HomeScreen()
+        PartyScreen()
     }
 }
 
