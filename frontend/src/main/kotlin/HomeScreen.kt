@@ -1,7 +1,9 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -52,7 +54,7 @@ fun HomeScreen() {
                 PartiesList()
             }
             Box(modifier = Modifier.weight(1f)) {
-                PartiesList()
+                FriendsList()
             }
         }
     }
@@ -98,11 +100,13 @@ fun ListHeader(name: String) {
 
 @Composable
 fun PrettyListContent(content: List<@Composable () -> Unit>) {
-    Column {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.verticalScroll(rememberScrollState())
+    ) {
         for (element in content) {
             Box(
                 modifier = Modifier
-                    .padding(8.dp)
                     .background(MaterialTheme.colors.secondaryVariant, RoundedCornerShape(8.dp))
                     .padding(8.dp)
                     .fillMaxWidth()
@@ -122,8 +126,8 @@ fun PartiesList() {
     )
     Column(
         modifier = Modifier
-            .padding(16.dp)
             .background(MaterialTheme.colors.background, RoundedCornerShape(16.dp))
+            .padding(8.dp)
             .fillMaxWidth()
     ) {
         ListHeader("Parties", "Add party") {}
@@ -133,25 +137,18 @@ fun PartiesList() {
 
 @Composable
 fun FriendsList() {
-    val listOfFriends = listOf("Avamaco", "Żonkil", "Mati")
-    Column {
-        Row {
-            Text("Friends")
-            IconButton(
-                onClick = {},
-                modifier = Modifier.background(MaterialTheme.colors.secondary, CircleShape)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add friend",
-                    tint = MaterialTheme.colors.primary
-                )
-            }
-        }
-        Column {
-            for (friend in listOfFriends) {
-                Text(friend)
-            }
-        }
+    val listOfFriends = listOf<@Composable () -> Unit>(
+        { Text("Żonkil")},
+        { Text("Mati")},
+        { Text("Kwiatek")}
+    )
+    Column(
+        modifier = Modifier
+            .background(MaterialTheme.colors.background, RoundedCornerShape(16.dp))
+            .padding(8.dp)
+            .fillMaxWidth()
+    ) {
+        ListHeader("Friends", "Add friend") {}
+        PrettyListContent(listOfFriends)
     }
 }
