@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(onNavigate: (Screen) -> Unit) {
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showAddPartyDialog by remember { mutableStateOf(false) }
     var showAddFriendDialog by remember { mutableStateOf(false) }
@@ -67,7 +67,7 @@ fun HomeScreen() {
             }
         }
         if (showLogoutDialog) {
-            LogoutDialog(onDismiss = { showLogoutDialog = false })
+            LogoutDialog(onDismiss = { showLogoutDialog = false }, onLogout = { onNavigate(Screen.Login) })
         }
         if (showAddPartyDialog) {
             TextFieldDialog(
@@ -87,7 +87,7 @@ fun HomeScreen() {
 }
 
 @Composable
-fun LogoutDialog(onDismiss: () -> Unit) {
+fun LogoutDialog(onDismiss: () -> Unit, onLogout: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
         Box(
             modifier = Modifier
@@ -101,7 +101,7 @@ fun LogoutDialog(onDismiss: () -> Unit) {
             ) {
                 Text(text = "Do you really want to log out?")
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = onDismiss) {
+                Button(onClick = onLogout) {
                     Text("Log out")
                 }
                 Button(onClick = onDismiss) {

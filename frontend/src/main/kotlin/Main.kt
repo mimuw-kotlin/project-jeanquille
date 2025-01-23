@@ -9,10 +9,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
+enum class Screen {
+    Login,
+    Home,
+    Party
+}
+
 @Composable
 @Preview
 fun App() {
-//    var text by remember { mutableStateOf("Hello, World!") }
+    var currentScreen by remember { mutableStateOf(Screen.Login) }
 
     MaterialTheme(
         colors = lightColors(
@@ -22,8 +28,11 @@ fun App() {
             background = Color(0xFFBADBED),
         )
     ) {
-//        HomeScreen()
-        PartyScreen()
+        when (currentScreen) {
+            Screen.Login -> LoginScreen { screen -> currentScreen = screen }
+            Screen.Home -> HomeScreen { screen -> currentScreen = screen }
+            Screen.Party -> PartyScreen { screen -> currentScreen = screen }
+        }
     }
 }
 
