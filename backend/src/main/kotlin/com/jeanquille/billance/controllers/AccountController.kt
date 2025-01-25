@@ -4,13 +4,10 @@ import com.jeanquille.billance.dto.AccountPostDto
 import com.jeanquille.billance.models.Account
 import com.jeanquille.billance.models.LoginRequest
 import com.jeanquille.billance.services.AccountService
-import org.hibernate.annotations.OptimisticLock
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
