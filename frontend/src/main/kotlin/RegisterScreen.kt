@@ -14,10 +14,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun LoginScreen(onNavigate: (Screen) -> Unit) {
+fun RegisterScreen(onNavigate: (Screen) -> Unit) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var phoneNumber by remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier
@@ -67,20 +68,30 @@ fun LoginScreen(onNavigate: (Screen) -> Unit) {
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
             )
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TextField(
+                value = phoneNumber,
+                onValueChange = { phoneNumber = it },
+                label = { Text("Phone number") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+            )
+
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = { onNavigate(Screen.Home) },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Login")
+                Text("Create new account")
             }
         }
         Button(
-            onClick = { onNavigate(Screen.Register) },
+            onClick = { onNavigate(Screen.Login) },
             modifier = Modifier.align(Alignment.BottomStart)
         ) {
-            Text("Create new account")
+            Text("Back to login screen")
         }
     }
 }
