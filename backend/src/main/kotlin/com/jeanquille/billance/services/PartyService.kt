@@ -30,11 +30,11 @@ class PartyService(
         return partyRepository.findById(partyId).orElseThrow()
     }
 
-    fun createParty(party: Party, creatorId: UUID): Party {
+    fun createParty(party: Party, creatorId: UUID) {
         val member = Member(party=party, account=Account(id=creatorId))
         party.members.add(member)
 
-        return partyRepository.save(party)
+        partyRepository.save(party)
     }
 
     fun updateParty(partyId: Long, newPartyName: String): Party {

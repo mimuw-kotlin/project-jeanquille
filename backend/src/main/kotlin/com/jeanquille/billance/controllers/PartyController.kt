@@ -26,11 +26,11 @@ class PartyController (private val partyService: PartyService) {
     }
 
     @PostMapping("/party/{creatorId}")
-    fun createParty(@PathVariable creatorId: UUID, @RequestBody json: Map<String, String>): Party {
+    fun createParty(@PathVariable creatorId: UUID, @RequestBody json: Map<String, String>) {
         val partyName = json["name"] ?: throw IllegalArgumentException("Name is required")
         val party = Party(name = partyName)
 
-        return partyService.createParty(party, creatorId)
+        partyService.createParty(party, creatorId)
     }
 
     @PostMapping("/party/{partyId}/member/{accountId}")

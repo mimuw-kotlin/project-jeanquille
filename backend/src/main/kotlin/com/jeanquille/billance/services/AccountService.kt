@@ -26,7 +26,7 @@ class AccountService(val accountRepository: AccountRepository) {
     }
 
     fun login(username: String, password: String): UUID {
-        val account = accountRepository.findByUsername(username)
+        val account = accountRepository.findByUsername(username) ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid credentials")
         if (BCryptPasswordEncoder().matches(password, account.password)) {
             return account.id!!
         }

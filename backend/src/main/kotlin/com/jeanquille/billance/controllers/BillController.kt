@@ -13,11 +13,6 @@ class BillController(private val billService: BillService) {
     @GetMapping("/bill/{billId}")
     fun getBill(@PathVariable billId: Long): Bill = billService.getBill(billId)
 
-    @PutMapping("/bill/{billId}")
-    fun updateBill(@PathVariable billId: Long, @RequestBody newBill: Bill) {
-        billService.updateBill(billId, newBill)
-    }
-
     @DeleteMapping("/bill/{billId}")
     fun deleteBill(@PathVariable billId: Long) {
         billService.deleteBill(billId)
