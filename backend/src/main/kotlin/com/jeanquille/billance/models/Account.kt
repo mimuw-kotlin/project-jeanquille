@@ -1,9 +1,9 @@
 package com.jeanquille.billance.models
 
 import com.fasterxml.jackson.annotation.JsonBackReference
-import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
-import java.util.UUID
+import java.util.*
 
 @Entity
 class Account (
@@ -11,7 +11,7 @@ class Account (
     @GeneratedValue(strategy = GenerationType.UUID)
     var id: UUID? = null,
     var username: String = "",
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     var password: String = "",
     var phoneNumber: String = "",
 

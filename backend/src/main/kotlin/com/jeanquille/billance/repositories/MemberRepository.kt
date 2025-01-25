@@ -8,5 +8,5 @@ import java.util.*
 @Repository
 interface MemberRepository: JpaRepository<Member, Long> {
     fun findAllByPartyId(partyId: Long): MutableList<Member>
-    fun findByAccountId(accountId: UUID): Member
+    fun findByAccountIdAndPartyId(accountId: UUID, partyId: Long): Member
 }

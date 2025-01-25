@@ -64,7 +64,7 @@ class PartyService(
         bill.amount = totalAmount
 
         val participants: MutableList<Member> = bill.participants.map {
-            memberRepository.findByAccountId(it.id!!)
+            memberRepository.findByAccountIdAndPartyId(it.id!!, bill.party.id!!)
         }.toMutableList()
 
         participants.forEach {
@@ -72,7 +72,7 @@ class PartyService(
             memberRepository.save(it)
         }
 
-        val payer: Member = memberRepository.findByAccountId(bill.payer.id!!)
+        val payer: Member = memberRepository.findByAccountIdAndPartyId(bill.payer.id!!, bill.party.id!!)
         payer.balance += totalAmount
         memberRepository.save(payer)
 
@@ -97,23 +97,25 @@ class PartyService(
             val payers = group.filter { it.balance < 0 }.sortedBy { it.balance }.reversed()
             val receivers = group.filter { it.balance > 0 }.sortedBy { it.balance }
 
-            var payerIndex = payers.size - 1
-            var receiverIndex = receivers.size - 1
+            val payersBalances = payers.map { it.balance }.toMutableList()
+            val receiversBalances = receivers.map { it.balance }.toMutableList()
+
+            var payerIndex = payersBalances.size - 1
+            var receiverIndex = receiversBalances.size - 1
 
             while (payerIndex >= 0 && receiverIndex >= 0) {
-                val payer = payers[payerIndex]
-                val receiver = receivers[receiverIndex]
-                val amount = minOf(-payer.balance, receiver.balance)
+                val amount = minOf(-payersBalances[payerIndex], receiversBalances[receiverIndex])
 
-                payer.balance += amount
-                receiver.balance -= amount
+                payersBalances[payerIndex] += amount
+                receiversBalances[receiverIndex] -= amount
 
-                transactions.add(Transaction(party=party, payer=payer.account, receiver=receiver.account, amount=amount))
+                transactions.add(Transaction(party=party,
+                    payer=payers[payerIndex].account, receiver=receivers[receiverIndex].account, amount=amount))
 
-                if (payer.balance == 0L) {
+                if (payersBalances[payerIndex] == 0L) {
                     payerIndex--
                 }
-                if (receiver.balance == 0L) {
+                if (receiversBalances[receiverIndex] == 0L) {
                     receiverIndex--
                 }
             }
