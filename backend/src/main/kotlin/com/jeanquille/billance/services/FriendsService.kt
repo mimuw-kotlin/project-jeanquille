@@ -4,7 +4,9 @@ import com.jeanquille.billance.models.Account
 import com.jeanquille.billance.repositories.AccountRepository
 import com.jeanquille.billance.utils.addFriend
 import com.jeanquille.billance.utils.removeFriend
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @Service
@@ -15,8 +17,16 @@ class FriendsService(private val accountRepository: AccountRepository) {
     }
 
     fun unfriend(accountId: UUID, friendId: UUID) {
+        if (accountId == friendId) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot unfriend self")
+        }
+
         val account: Account = accountRepository.findById(accountId).orElseThrow()
         val friend: Account = accountRepository.findById(friendId).orElseThrow()
+
+        if (!account.friends.contains(friend)) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Not a friend")
+        }
 
         account.removeFriend(friend)
         friend.removeFriend(account)
@@ -24,8 +34,16 @@ class FriendsService(private val accountRepository: AccountRepository) {
     }
 
     fun addFriend(accountId: UUID, friendId: UUID) {
+        if (accountId == friendId) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot add self as friend")
+        }
+
         val account: Account = accountRepository.findById(accountId).orElseThrow()
         val friend: Account = accountRepository.findById(friendId).orElseThrow()
+
+        if (account.friends.contains(friend)) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Already a friend")
+        }
 
         account.addFriend(friend)
         friend.addFriend(account)
