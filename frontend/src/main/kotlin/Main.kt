@@ -20,6 +20,7 @@ enum class Screen {
 @Preview
 fun App() {
     var currentScreen by remember { mutableStateOf(Screen.Login) }
+    var currentUser by remember { mutableStateOf("") }
 
     MaterialTheme(
         colors = lightColors(
@@ -30,8 +31,11 @@ fun App() {
         )
     ) {
         when (currentScreen) {
-            Screen.Login -> LoginScreen { screen -> currentScreen = screen }
-            Screen.Home -> HomeScreen { screen -> currentScreen = screen }
+            Screen.Login -> LoginScreen(
+                onNavigate = { screen -> currentScreen = screen },
+                onSetUser = { user -> currentUser = user }
+            )
+            Screen.Home -> HomeScreen(currentUser) { screen -> currentScreen = screen }
             Screen.Party -> PartyScreen { screen -> currentScreen = screen }
             Screen.Register -> RegisterScreen { screen -> currentScreen = screen }
         }

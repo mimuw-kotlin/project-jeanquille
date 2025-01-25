@@ -1,5 +1,7 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,12 +16,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(onNavigate: (Screen) -> Unit) {
+fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit) {
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showAddPartyDialog by remember { mutableStateOf(false) }
     var showAddFriendDialog by remember { mutableStateOf(false) }
+    var user: Account? by remember { mutableStateOf(null) }
+
+    val error = remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        try {
+            user = fetchAccount(userId)
+        } catch (e: Exception) {
+            error.value = e.message
+        }
+    }
+
+    if (error.value != null) {
+        Text("Error: ${error.value}", color = MaterialTheme.colors.error)
+        return
+    } else if (user == null) {
+        CircularProgressIndicator()
+        return
+    }
 
     Box(
         modifier = Modifier
@@ -38,7 +60,7 @@ fun HomeScreen(onNavigate: (Screen) -> Unit) {
                     .padding(16.dp)
             ) {
                 Text(
-                    text = "Avamaco",
+                    text = user!!.username,
                     fontSize = 24.sp
                 )
                 IconButton(
