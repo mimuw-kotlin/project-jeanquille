@@ -1,5 +1,6 @@
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.Serializable
 
@@ -13,9 +14,31 @@ data class Party(
     val transactions: List<Transaction>
 )
 
-suspend fun fetchParties(): List<Party> {
-    val url = "http://localhost:8080/parties"
+suspend fun fetchParties(userId: String): List<Party> {
+    val url = "http://localhost:8080/parties/$userId"
     return client.get(url) {
         contentType(ContentType.Application.Json)
     }.body() // ListSerializer(Party.serializer()) is applied automatically
+}
+
+suspend fun createParty(userId: String, partyName: String): String {
+    var responseMessage: String
+    try {
+        val response: HttpResponse = client.post("http://localhost:8080/party/$userId") {
+            contentType(ContentType.Application.Json)
+            setBody(
+                mapOf(
+                    "name" to partyName
+                )
+            )
+        }
+        responseMessage = if (response.status == HttpStatusCode.OK) {
+            "Create party successful!"
+        } else {
+            "Create party failed: ${response.status}"
+        }
+    } catch (e: Exception) {
+        responseMessage = "Error: ${e.message}"
+    }
+    return responseMessage
 }

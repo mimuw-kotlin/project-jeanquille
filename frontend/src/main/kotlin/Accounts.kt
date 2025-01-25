@@ -77,7 +77,6 @@ suspend fun loginUser(username: String, password: String): LoginResult {
 
 suspend fun fetchAccount(userId: String): Account {
     val url = "http://localhost:8080/account/$userId"
-    println(url)
     return client.get(url) {
         contentType(ContentType.Application.Json)
     }.body()
