@@ -20,19 +20,15 @@ class PartyController (private val partyService: PartyService) {
     @GetMapping("/parties")
     fun getAllParties(): List<Party> = partyService.getAllParties()
 
-    @PutMapping("/party/{partyId}/name")
-    fun updatePartyName(@PathVariable partyId: Long, @RequestBody json: Map<String, String>): Party {
-        return partyService.updateParty(partyId, json["name"]!!)
-    }
-
     @DeleteMapping("/party/{partyId}")
     fun deleteParty(@PathVariable partyId: Long) {
         partyService.deleteParty(partyId)
     }
 
     @PostMapping("/party/{creatorId}")
-    fun createParty(@PathVariable creatorId: UUID): Party {
-        val party = Party()
+    fun createParty(@PathVariable creatorId: UUID, @RequestBody json: Map<String, String>): Party {
+        val partyName = json["name"] ?: throw IllegalArgumentException("Name is required")
+        val party = Party(name = partyName)
 
         return partyService.createParty(party, creatorId)
     }
