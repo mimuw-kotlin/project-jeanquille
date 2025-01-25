@@ -8,4 +8,5 @@ import java.util.UUID
 @Repository
 interface AccountRepository: JpaRepository<Account, UUID> {
     fun existsByUsername(username: String): Boolean
+    fun findByUsername(username: String): Account
 }
