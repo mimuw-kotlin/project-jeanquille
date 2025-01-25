@@ -36,13 +36,6 @@ class PartyService(
 
         partyRepository.save(party)
     }
-
-    fun updateParty(partyId: Long, newPartyName: String): Party {
-        val party = partyRepository.findById(partyId).orElseThrow()
-        party.name = newPartyName
-        return partyRepository.save(party)
-    }
-
     fun deleteParty(partyId: Long) {
         partyRepository.deleteById(partyId)
     }
