@@ -12,7 +12,8 @@ import androidx.compose.ui.window.application
 enum class Screen {
     Login,
     Home,
-    Party
+    Party,
+    Register
 }
 
 @Composable
@@ -32,6 +33,7 @@ fun App() {
             Screen.Login -> LoginScreen { screen -> currentScreen = screen }
             Screen.Home -> HomeScreen { screen -> currentScreen = screen }
             Screen.Party -> PartyScreen { screen -> currentScreen = screen }
+            Screen.Register -> RegisterScreen { screen -> currentScreen = screen }
         }
     }
 }
