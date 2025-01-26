@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -93,11 +94,15 @@ fun InfoDialog(text: String, onDismiss: () -> Unit) {
     }
 }
 @Composable
-fun ListHeader(name: String, showButton: Boolean, buttonDescription: String = "", onButtonClick: () -> Unit = {}) {
+fun ListHeader(name: String,
+               showButton: Boolean,
+               buttonDescription: String = "",
+               onButtonClick: () -> Unit = {},
+               buttonIcon: ImageVector) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = androidx.compose.ui.Modifier.padding(16.dp).fillMaxWidth()
+        modifier = Modifier.padding(16.dp).fillMaxWidth()
     ) {
         Text(
             text = name,
@@ -109,7 +114,7 @@ fun ListHeader(name: String, showButton: Boolean, buttonDescription: String = ""
                 modifier = Modifier.background(MaterialTheme.colors.secondary, CircleShape)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Add,
+                    imageVector = buttonIcon,
                     contentDescription = buttonDescription,
                     tint = MaterialTheme.colors.primary
                 )
@@ -142,14 +147,15 @@ fun PrettyList(name: String,
                showButton: Boolean,
                buttonDescription: String = "",
                onButtonClick: () -> Unit = {},
-               content: List<@Composable () -> Unit>) {
+               content: List<@Composable () -> Unit>,
+               buttonIcon: ImageVector = Icons.Default.Add) {
     Column(
         modifier = Modifier
             .background(MaterialTheme.colors.background, RoundedCornerShape(16.dp))
             .padding(8.dp)
             .fillMaxWidth()
     ) {
-        ListHeader(name, showButton, buttonDescription, onButtonClick)
+        ListHeader(name, showButton, buttonDescription, onButtonClick, buttonIcon)
         PrettyListContent(content)
     }
 }

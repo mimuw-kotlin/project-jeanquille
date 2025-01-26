@@ -73,6 +73,10 @@ suspend fun addBill(partyId: Long, billName: String, amount: Long, payerId: Stri
         contentType(ContentType.Application.Json)
         setBody(body)
     }
-    println(response)
+    return response
+}
+
+suspend fun sumup(partyId: Long): HttpResponse {
+    val response: HttpResponse = client.post("http://localhost:8080/party/$partyId/sumup")
     return response
 }

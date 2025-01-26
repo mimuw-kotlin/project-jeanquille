@@ -101,7 +101,16 @@ fun PartyScreen(party: Party, userId: String, onNavigate: (Screen) -> Unit) {
                     BillsList({ showAddBillDialog = true }, localParty, { showBillInfoDialog = it }, { showBillRemoveDialog = it })
                 }
                 Box(modifier = Modifier.weight(1f)) {
-                    TransactionsList(localParty) { showTransactionInfoDialog = it }
+                    TransactionsList(
+                        localParty,
+                        onButtonClick = { showTransactionInfoDialog = it },
+                        onSumup = {
+                            CoroutineScope(Dispatchers.Default).launch {
+                                sumup(localParty.id)
+                                reloadParty()
+                            }
+                        }
+                    )
                 }
             }
         }
@@ -337,9 +346,9 @@ fun BillsList(onButtonClick: () -> Unit, party: Party, onInfoClick: (Bill) -> Un
 }
 
 @Composable
-fun TransactionsList(party: Party, onButtonClick: (Transaction) -> Unit) {
+fun TransactionsList(party: Party, onButtonClick: (Transaction) -> Unit, onSumup: () -> Unit) {
     val listOfTransactions = party.transactions.map { transaction: Transaction -> @Composable{ TransactionCard(transaction, onButtonClick) } }
-    PrettyList("Transactions", false, content = listOfTransactions)
+    PrettyList("Transactions", true, "Sumup", onSumup, listOfTransactions, Icons.Default.Refresh)
 }
 
 @Composable
@@ -350,7 +359,7 @@ fun TransactionCard(transaction: Transaction, onButtonClick: (Transaction) -> Un
         modifier = Modifier.fillMaxSize()
     ) {
         Text(
-            text = transaction.payer.username + " owes " + transaction.receiver.username + " " + transaction.amount.toString(),
+            text = "${transaction.payer.username} owes ${transaction.receiver.username} ${(transaction.amount.toDouble() / 100)} zł",
         )
 
         IconButton(
