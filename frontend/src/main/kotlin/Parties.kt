@@ -3,6 +3,8 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Serializable
 data class Party(
@@ -12,6 +14,14 @@ data class Party(
     val members: List<Member>,
     val bills: List<Bill>,
     val transactions: List<Transaction>
+)
+
+@Serializable
+data class BillPostBody(
+    val name: String,
+    val payerId: String,
+    val amount: Long,
+    val participantsIds: List<String>
 )
 
 suspend fun fetchParties(userId: String): List<Party> {
@@ -52,5 +62,33 @@ suspend fun createParty(userId: String, partyName: String): String {
 
 suspend fun addMember(partyId: Long, friendId: String): HttpResponse {
     val response: HttpResponse = client.post("http://localhost:8080/party/$partyId/member/$friendId")
+    return response
+}
+
+suspend fun addBill(partyId: Long, billName: String, amount: Long, payerId: String, participantsIds: List<String>): HttpResponse {
+//    val hydraulika = Json.encodeToString(
+//        mapOf(
+//            "name" to billName,
+//            "amount" to amount,
+//            "payerId" to payerId,
+//            "participantsIds" to participantsIds
+//        )
+//    )
+    val xd = BillPostBody(billName, payerId, amount, participantsIds)
+
+    val response: HttpResponse = client.post("http://localhost:8080/party/$partyId/bill") {
+//        setBody(hydraulika)
+            contentType(ContentType.Application.Json)
+        setBody(xd)
+//            setBody(
+//                mapOf(
+//                    "name" to billName,
+//                    "amount" to amount,
+//                    "payerId" to payerId,
+//                    "participantsIds" to participantsIds
+//                )
+//            )
+    }
+    println(response)
     return response
 }

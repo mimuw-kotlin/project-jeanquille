@@ -1,12 +1,13 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,11 +19,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlin.math.roundToLong
 
 @Composable
 fun PartyScreen(party: Party, userId: String, onNavigate: (Screen) -> Unit) {
     var localParty by remember { mutableStateOf(party) }
     var showAddMemberDialog by remember { mutableStateOf(false) }
+    var showAddBillDialog by remember { mutableStateOf(false) }
     var showTransactionInfoDialog : Transaction? by remember { mutableStateOf(null) }
     var showBillInfoDialog : Bill? by remember { mutableStateOf(null) }
     var showBillRemoveDialog : Bill? by remember { mutableStateOf(null) }
@@ -95,7 +98,7 @@ fun PartyScreen(party: Party, userId: String, onNavigate: (Screen) -> Unit) {
                     MembersList({ showAddMemberDialog = true }, localParty) { showMemberRemoveDialog = it }
                 }
                 Box(modifier = Modifier.weight(1f)) {
-                    BillsList({}, localParty, { showBillInfoDialog = it }, { showBillRemoveDialog = it })
+                    BillsList({ showAddBillDialog = true }, localParty, { showBillInfoDialog = it }, { showBillRemoveDialog = it })
                 }
                 Box(modifier = Modifier.weight(1f)) {
                     TransactionsList(localParty) { showTransactionInfoDialog = it }
@@ -159,6 +162,9 @@ fun PartyScreen(party: Party, userId: String, onNavigate: (Screen) -> Unit) {
                 noAnswer = "No",
             )
         }
+        if (showAddBillDialog) {
+            AddBillDialog({ showAddBillDialog = false }, localParty, { reloadParty() })
+        }
     }
 }
 
@@ -220,6 +226,97 @@ fun AddMemberDialog(onDismiss: () -> Unit, party: Party, friends: List<Account>,
                 }
                 if (showError) {
                     Text("Error: choose a friend before clicking \"Confirm\"")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AddBillDialog(onDismiss: () -> Unit, party: Party, reloadParty: () -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    var payer: Account? by remember { mutableStateOf(null) }
+    val participants: MutableSet<String> by remember { mutableStateOf(mutableSetOf()) }
+    var billName by remember { mutableStateOf("") }
+    var amount by remember { mutableStateOf("") }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier
+                .wrapContentSize(Alignment.Center)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .background(color = MaterialTheme.colors.background, RoundedCornerShape(16.dp))
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Text(text = "Create a bill")
+                Spacer(modifier = Modifier.height(16.dp))
+                TextField(
+                    value = billName,
+                    onValueChange = { billName = it },
+                    label = { Text("Bill name") }
+                )
+                TextField(
+                    value = amount,
+                    onValueChange = { amount = it },
+                    label = { Text("Amount") }
+                )
+                Button(onClick = { expanded = !expanded },
+                ) {
+                    Text(payer?.username ?: "Click here to choose payer")
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    party.members.forEach { member ->
+                        DropdownMenuItem(
+                            onClick = {
+                                payer = member.account
+                                expanded = !expanded
+                            }
+                        ) {
+                            Text(member.account.username)
+                        }
+                    }
+                }
+                Column {
+                    for (member in party.members) {
+                        Row {
+                            var checked by remember { mutableStateOf(false) }
+                            Text(member.account.username)
+                            Checkbox(
+                                checked = checked,
+                                onCheckedChange = {
+                                    if (it) {
+                                        participants.add(member.account.id)
+                                    }
+                                    else {
+                                        participants.remove(member.account.id)
+                                    }
+                                    checked = !checked
+                                },
+                            )
+                        }
+                    }
+                }
+
+                Button(onClick = {
+                        CoroutineScope(Dispatchers.Default).launch {
+                            addBill(party.id, billName, (amount.toDouble() * 100).roundToLong(), payer!!.id, participants.toList())
+                            reloadParty()
+                        }
+                        onDismiss()
+                    },
+                    enabled = !(payer == null || amount.toDoubleOrNull() == null || participants.isEmpty())
+                ) {
+                    Text("Accept")
+                }
+                Button(onClick = onDismiss) {
+                    Text("Cancel")
                 }
             }
         }
