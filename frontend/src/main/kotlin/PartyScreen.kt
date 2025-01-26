@@ -34,7 +34,6 @@ fun PartyScreen(party: Party, userId: String, onNavigate: (Screen) -> Unit) {
             try {
                 localParty = fetchParty(party.id)
                 friends = fetchFriends(userId)
-                println (localParty.name)
             } catch (e: Exception) {
                 // Handle error
             }
@@ -104,70 +103,7 @@ fun PartyScreen(party: Party, userId: String, onNavigate: (Screen) -> Unit) {
             }
         }
         if (showAddMemberDialog) {
-            AddMemberDialog({ showAddMemberDialog = false }, localParty, friends!!)
-        }
-    }
-}
-
-@Composable
-fun AddMemberDialog(onDismiss: () -> Unit, party: Party, friends: List<Account>) {
-    var expanded by remember { mutableStateOf(false) }
-    var chosenOption: Account? by remember { mutableStateOf(null) }
-    var showError by remember { mutableStateOf(false) }
-    Dialog(onDismissRequest = onDismiss) {
-        Box(
-            modifier = Modifier
-                .wrapContentSize(Alignment.Center)
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .background(color = MaterialTheme.colors.background, RoundedCornerShape(16.dp))
-                    .padding(16.dp)
-            ) {
-                Text(text = "Choose a friend to add")
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = { expanded = !expanded },
-                    ) {
-                    Text(chosenOption?.username ?: "Click here to choose")
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    friends.forEach { friend ->
-                        DropdownMenuItem(
-                            onClick = {
-                                chosenOption = friend
-                                expanded = !expanded
-                            }
-                        ) {
-                            Text(friend.username)
-                        }
-                    }
-                }
-                Button(
-                    onClick = {
-                        if (chosenOption == null) {
-                            showError = true
-                        }
-                        else {
-                            CoroutineScope(Dispatchers.Default).launch {
-                                addMember(party.id, chosenOption!!.id)
-                            }
-                            onDismiss()
-                        }
-                    }
-                ) {
-                    Text("Confirm")
-                }
-                Button(onClick = onDismiss) {
-                    Text("Cancel")
-                }
-                if (showError) {
-                    Text("Error: choose a friend before clicking \"Confirm\"")
-                }
-            }
+            AddMemberDialog({ showAddMemberDialog = false }, localParty, friends!!, ::reloadParty)
         }
         if (showTransactionInfoDialog != null) {
             InfoDialog(
@@ -222,6 +158,70 @@ fun AddMemberDialog(onDismiss: () -> Unit, party: Party, friends: List<Account>)
                 yesAnswer = "Yes",
                 noAnswer = "No",
             )
+        }
+    }
+}
+
+@Composable
+fun AddMemberDialog(onDismiss: () -> Unit, party: Party, friends: List<Account>, reloadParty: () -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    var chosenOption: Account? by remember { mutableStateOf(null) }
+    var showError by remember { mutableStateOf(false) }
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier
+                .wrapContentSize(Alignment.Center)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .background(color = MaterialTheme.colors.background, RoundedCornerShape(16.dp))
+                    .padding(16.dp)
+            ) {
+                Text(text = "Choose a friend to add")
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = { expanded = !expanded },
+                    ) {
+                    Text(chosenOption?.username ?: "Click here to choose")
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    friends.forEach { friend ->
+                        DropdownMenuItem(
+                            onClick = {
+                                chosenOption = friend
+                                expanded = !expanded
+                            }
+                        ) {
+                            Text(friend.username)
+                        }
+                    }
+                }
+                Button(
+                    onClick = {
+                        if (chosenOption == null) {
+                            showError = true
+                        }
+                        else {
+                            CoroutineScope(Dispatchers.Default).launch {
+                                addMember(party.id, chosenOption!!.id)
+                                reloadParty()
+                            }
+                            onDismiss()
+                        }
+                    }
+                ) {
+                    Text("Confirm")
+                }
+                Button(onClick = onDismiss) {
+                    Text("Cancel")
+                }
+                if (showError) {
+                    Text("Error: choose a friend before clicking \"Confirm\"")
+                }
+            }
         }
     }
 }
