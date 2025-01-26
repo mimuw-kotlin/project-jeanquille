@@ -6,7 +6,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
@@ -17,7 +16,6 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
 
 @Composable
 fun PartyScreen(party: Party, onNavigate: (Screen) -> Unit) {
@@ -83,13 +81,13 @@ fun PartyScreen(party: Party, onNavigate: (Screen) -> Unit) {
                     .fillMaxWidth()
             ) {
                 Box(modifier = Modifier.weight(1f)) {
-                    MembersList({ showAddMemberDialog = true })
+                    MembersList({ showAddMemberDialog = true }, localParty)
                 }
                 Box(modifier = Modifier.weight(1f)) {
-                    BillsList({})
+                    BillsList({}, localParty)
                 }
                 Box(modifier = Modifier.weight(1f)) {
-                    TransactionsList()
+                    TransactionsList(localParty)
                 }
             }
         }
@@ -104,31 +102,20 @@ fun PartyScreen(party: Party, onNavigate: (Screen) -> Unit) {
 }
 
 @Composable
-fun MembersList(onButtonClick: () -> Unit) {
-    val listOfMembers = listOf<@Composable () -> Unit>(
-        { Text("Meten")},
-        { Text("Matdas")},
-        { Text("Avamaco")}
-    )
+fun MembersList(onButtonClick: () -> Unit, party: Party) {
+    val listOfMembers = party.members.map { member: Member -> @Composable{ Text(member.account.username) } }
+
     PrettyList("Members", true, "Add member", onButtonClick, listOfMembers)
 }
 
 @Composable
-fun BillsList(onButtonClick: () -> Unit) {
-    val listOfBills = listOf<@Composable () -> Unit>(
-        { Text("Bill1")},
-        { Text("Bill2")},
-        { Text("Bill3")}
-    )
+fun BillsList(onButtonClick: () -> Unit, party: Party) {
+    val listOfBills = party.bills.map { bill: Bill -> @Composable{ Text(bill.name) } }
     PrettyList("Bills", true, "Add bill", onButtonClick, listOfBills)
 }
 
 @Composable
-fun TransactionsList() {
-    val listOfTransactions = listOf<@Composable () -> Unit>(
-        { Text("Transaction1")},
-        { Text("Transaction2")},
-        { Text("Transaction3")}
-    )
+fun TransactionsList(party: Party) {
+    val listOfTransactions = party.transactions.map { transaction: Transaction -> @Composable{ Text(transaction.id.toString()) } }
     PrettyList("Transactions", false, content = listOfTransactions)
 }
