@@ -66,28 +66,12 @@ suspend fun addMember(partyId: Long, friendId: String): HttpResponse {
 }
 
 suspend fun addBill(partyId: Long, billName: String, amount: Long, payerId: String, participantsIds: List<String>): HttpResponse {
-//    val hydraulika = Json.encodeToString(
-//        mapOf(
-//            "name" to billName,
-//            "amount" to amount,
-//            "payerId" to payerId,
-//            "participantsIds" to participantsIds
-//        )
-//    )
-    val xd = BillPostBody(billName, payerId, amount, participantsIds)
+
+    val body = BillPostBody(billName, payerId, amount, participantsIds)
 
     val response: HttpResponse = client.post("http://localhost:8080/party/$partyId/bill") {
-//        setBody(hydraulika)
-            contentType(ContentType.Application.Json)
-        setBody(xd)
-//            setBody(
-//                mapOf(
-//                    "name" to billName,
-//                    "amount" to amount,
-//                    "payerId" to payerId,
-//                    "participantsIds" to participantsIds
-//                )
-//            )
+        contentType(ContentType.Application.Json)
+        setBody(body)
     }
     println(response)
     return response
