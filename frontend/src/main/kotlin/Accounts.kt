@@ -83,7 +83,7 @@ suspend fun addFriend(userId: String, friendName: String): HttpResponse {
 }
 
 suspend fun removeFriend(userId: String, friendId: String): HttpResponse {
-    val response: HttpResponse = client.post("http://localhost:8080/friends/$userId/unfriend/$friendId")
+    val response: HttpResponse = client.delete("http://localhost:8080/friends/$userId/unfriend/$friendId")
     return response
 }
 

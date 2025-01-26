@@ -72,6 +72,27 @@ fun TextFieldDialog(question: String, onAccept: (String) -> Unit, onDismiss: () 
 }
 
 @Composable
+fun InfoDialog(text: String, onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier
+                .wrapContentSize(Alignment.Center)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .background(color = MaterialTheme.colors.background, RoundedCornerShape(16.dp))
+                    .padding(16.dp)
+            ) {
+                Text(text = text)
+                Button(onClick = onDismiss) {
+                    Text("OK")
+                }
+            }
+        }
+    }
+}
+@Composable
 fun ListHeader(name: String, showButton: Boolean, buttonDescription: String = "", onButtonClick: () -> Unit = {}) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,

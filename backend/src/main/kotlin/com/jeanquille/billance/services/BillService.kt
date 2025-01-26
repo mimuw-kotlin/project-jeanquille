@@ -1,29 +1,39 @@
 package com.jeanquille.billance.services
 
 import com.jeanquille.billance.models.Bill
+import com.jeanquille.billance.models.Member
 import com.jeanquille.billance.repositories.BillRepository
+import com.jeanquille.billance.repositories.MemberRepository
 import org.springframework.stereotype.Service
 
 @Service
-class BillService(val billRepository: BillRepository) {
+class BillService(
+    private val billRepository: BillRepository,
+    private val memberRepository: MemberRepository
+) {
     fun getAllBills(): MutableList<Bill> {
         return billRepository.findAll()
     }
 
-    fun getBillsInParty(partyId: Long): MutableList<Bill> {
-        return billRepository.findByPartyId(partyId)
-    }
-
     fun deleteBill(billId: Long) {
-        billRepository.deleteById(billId)
-    }
+        val bill: Bill = billRepository.findById(billId).orElseThrow()
+        val n: Int = bill.participants.size
+        val amountPerPerson: Long = bill.amount / n
 
-    fun updateBill(billId: Long, newBill: Bill) {
-        val billToUpdate: Bill = billRepository.findById(billId).orElseThrow()
-        billToUpdate.amount = newBill.amount
-        billToUpdate.date = newBill.date
-        billToUpdate.name = newBill.name
-        billRepository.save(billToUpdate)
+        val participants: MutableList<Member> = bill.participants.map {
+            memberRepository.findByAccountIdAndPartyId(it.id!!, bill.party.id!!)
+        }.toMutableList()
+
+        participants.forEach {
+            it.balance += amountPerPerson
+            memberRepository.save(it)
+        }
+
+        val payer: Member = memberRepository.findByAccountIdAndPartyId(bill.payer.id!!, bill.party.id!!)
+        payer.balance -= bill.amount
+        memberRepository.save(payer)
+
+        billRepository.deleteById(billId)
     }
 
     fun getBill(billId: Long): Bill = billRepository.findById(billId).orElseThrow()

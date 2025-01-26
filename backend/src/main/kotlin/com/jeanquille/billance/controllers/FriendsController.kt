@@ -2,6 +2,7 @@ package com.jeanquille.billance.controllers
 
 import com.jeanquille.billance.models.Account
 import com.jeanquille.billance.services.FriendsService
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -20,7 +21,7 @@ class FriendsController(private val friendsService: FriendsService) {
         friendsService.addFriend(accountId, friendUsername)
     }
 
-    @PostMapping("/friends/{accountId}/unfriend/{friendId}")
+    @DeleteMapping("/friends/{accountId}/unfriend/{friendId}")
     fun unfriend(@PathVariable accountId: UUID, @PathVariable friendId: UUID) {
         friendsService.unfriend(accountId, friendId)
     }

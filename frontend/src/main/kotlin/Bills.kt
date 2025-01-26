@@ -1,5 +1,6 @@
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import kotlinx.serialization.Serializable
-import java.util.*
 
 @Serializable
 data class Bill(
@@ -10,3 +11,8 @@ data class Bill(
     val payer: Account,
     val participants: List<Account>
 )
+
+suspend fun removeBill(billId: Long): HttpResponse {
+    val response: HttpResponse = client.delete("http://localhost:8080/bill/$billId")
+    return response
+}
