@@ -123,7 +123,7 @@ fun PartyScreen(party: Party, userId: String, onNavigate: (Screen) -> Unit) {
             InfoDialog(
                 text = "Name: " + showBillInfoDialog!!.name + "\n" +
                         "Date: " + showBillInfoDialog!!.date + "\n" +
-                        "Amount: " + showBillInfoDialog!!.amount + "\n" +
+                        "Amount: " + (showBillInfoDialog!!.amount.toDouble() / 100) + "zł\n" +
                         "Payer: " + showBillInfoDialog!!.payer.username + "\n" +
                         "Participants: " + showBillInfoDialog!!.participants.map { it.username }.joinToString(", "),
 
@@ -373,7 +373,7 @@ fun BillCard(bill: Bill, onInfoClick: (Bill) -> Unit, onRemoveBill: (Bill) -> Un
         modifier = Modifier.fillMaxSize()
     ) {
         Text(
-            text = bill.name + " " + bill.amount.toString() + "zł"
+            text = bill.name + " " + (bill.amount.toDouble() / 100).toString() + "zł"
         )
 
         IconButton(
@@ -410,7 +410,7 @@ fun MemberCard(member: Member, onRemoveMember: (Member) -> Unit) {
         )
 
         Text(
-            text = member.balance.toString() + "zł"
+            text = (member.balance.toDouble() / 100).toString() + "zł"
         )
 
         IconButton(
