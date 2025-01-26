@@ -33,13 +33,12 @@ class FriendsService(private val accountRepository: AccountRepository) {
         accountRepository.saveAll(mutableListOf(account, friend))
     }
 
-    fun addFriend(accountId: UUID, friendId: UUID) {
-        if (accountId == friendId) {
+    fun addFriend(accountId: UUID, friendUsername: String) {
+        val account: Account = accountRepository.findById(accountId).orElseThrow()
+        val friend: Account = accountRepository.findByUsername(friendUsername) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Friend not found")
+        if (account.id == friend.id) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot add self as friend")
         }
-
-        val account: Account = accountRepository.findById(accountId).orElseThrow()
-        val friend: Account = accountRepository.findById(friendId).orElseThrow()
 
         if (account.friends.contains(friend)) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "Already a friend")

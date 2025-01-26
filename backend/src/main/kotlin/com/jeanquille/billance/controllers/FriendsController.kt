@@ -15,9 +15,9 @@ class FriendsController(private val friendsService: FriendsService) {
         return friendsService.getFriends(accountId)
     }
 
-    @PostMapping("/friends/{accountId}/add/{friendId}")
-    fun addFriend(@PathVariable accountId: UUID, @PathVariable friendId: UUID) {
-        friendsService.addFriend(accountId, friendId)
+    @PostMapping("/friends/{accountId}/add/{friendUsername}")
+    fun addFriend(@PathVariable accountId: UUID, @PathVariable friendUsername: String) {
+        friendsService.addFriend(accountId, friendUsername)
     }
 
     @PostMapping("/friends/{accountId}/unfriend/{friendId}")
