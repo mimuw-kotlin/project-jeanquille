@@ -22,8 +22,15 @@ fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party)
     var showAddFriendDialog by remember { mutableStateOf(false) }
     var removedFriend: Account? by remember { mutableStateOf(null) }
     var user: Account? by remember { mutableStateOf(null) }
+    var friends by remember { mutableStateOf<List<Account>?>(null) }
+    var parties by remember { mutableStateOf<List<Party>?>(null) }
 
     val error = remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        friends = fetchFriends(userId)
+        parties = fetchParties(userId)
+    }
 
     LaunchedEffect(Unit) {
         try {
@@ -62,6 +69,21 @@ fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party)
                     fontSize = 24.sp
                 )
                 IconButton(
+                    onClick = {
+                        CoroutineScope(Dispatchers.Default).launch {
+                            friends = fetchFriends(userId)
+                            parties = fetchParties(userId)
+                        }
+                    },
+                    modifier = Modifier.background(MaterialTheme.colors.secondary, CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Refresh",
+                        tint = MaterialTheme.colors.primary
+                    )
+                }
+                IconButton(
                     onClick = {showLogoutDialog = true},
                     modifier = Modifier.background(MaterialTheme.colors.secondary, CircleShape)
                 ) {
@@ -79,10 +101,10 @@ fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party)
                     .fillMaxWidth()
             ) {
                 Box(modifier = Modifier.weight(1f)) {
-                    PartiesList({ showAddPartyDialog = true }, userId, onSetParty, onNavigate)
+                    PartiesList(parties, { showAddPartyDialog = true }, onSetParty, onNavigate)
                 }
                 Box(modifier = Modifier.weight(1f)) {
-                    FriendsList({ showAddFriendDialog = true }, userId, { friend -> removedFriend = friend })
+                    FriendsList(friends, { showAddFriendDialog = true }, { friend -> removedFriend = friend })
                 }
             }
         }
@@ -210,11 +232,7 @@ fun FriendCard(friend: Account, onRemoveFriend: (Account) -> Unit) {
 }
 
 @Composable
-fun PartiesList(onButtonClick: () -> Unit, userId: String, onSetParty: (Party) -> Unit, onNavigate: (Screen) -> Unit) {
-    var parties by remember { mutableStateOf<List<Party>?>(null) }
-    LaunchedEffect(Unit) {
-        parties = fetchParties(userId)
-    }
+fun PartiesList(parties: List<Party>?, onButtonClick: () -> Unit, onSetParty: (Party) -> Unit, onNavigate: (Screen) -> Unit) {
     if (parties == null) {
         return
     }
@@ -224,15 +242,10 @@ fun PartiesList(onButtonClick: () -> Unit, userId: String, onSetParty: (Party) -
 }
 
 @Composable
-fun FriendsList(onButtonClick: () -> Unit, userId: String, onRemoveFriend: (Account) -> Unit) {
-    var friends by remember { mutableStateOf<List<Account>?>(null) }
-    LaunchedEffect(Unit) {
-        friends = fetchFriends(userId)
-    }
+fun FriendsList(friends: List<Account>?, onButtonClick: () -> Unit, onRemoveFriend: (Account) -> Unit) {
     if (friends == null) {
         return
     }
-
     val listOfFriends = friends!!.map { friend: Account -> @Composable{ FriendCard(friend, onRemoveFriend) } }
     PrettyList("Friends", true, "Add friend", onButtonClick, listOfFriends)
 }
