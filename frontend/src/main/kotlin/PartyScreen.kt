@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun PartyScreen(onNavigate: (Screen) -> Unit) {
+fun PartyScreen(party: Party, onNavigate: (Screen) -> Unit) {
     var showAddMemberDialog by remember { mutableStateOf(false) }
 
     Box(
@@ -35,7 +35,7 @@ fun PartyScreen(onNavigate: (Screen) -> Unit) {
                     .padding(16.dp)
             ) {
                 Text(
-                    text = "Party1",
+                    text = party.name,
                     fontSize = 24.sp
                 )
                 IconButton(

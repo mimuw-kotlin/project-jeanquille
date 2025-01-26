@@ -12,6 +12,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterScreen(onNavigate: (Screen) -> Unit) {
@@ -19,6 +22,7 @@ fun RegisterScreen(onNavigate: (Screen) -> Unit) {
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var phoneNumber by remember { mutableStateOf("") }
+    var responseMessage by remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier
@@ -81,10 +85,19 @@ fun RegisterScreen(onNavigate: (Screen) -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { onNavigate(Screen.Home) },
+                onClick = {
+                    CoroutineScope(Dispatchers.IO).launch {
+                       responseMessage = registerUser(username, password, phoneNumber)
+                    }
+//                    onNavigate(Screen.Login)
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Create new account")
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            if (responseMessage.isNotEmpty()) {
+                Text(responseMessage)
             }
         }
         Button(

@@ -1,5 +1,7 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,18 +10,43 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(onNavigate: (Screen) -> Unit) {
+fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party) -> Unit) {
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showAddPartyDialog by remember { mutableStateOf(false) }
     var showAddFriendDialog by remember { mutableStateOf(false) }
+    var user: Account? by remember { mutableStateOf(null) }
+
+    val error = remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        try {
+            user = fetchAccount(userId)
+        } catch (e: Exception) {
+            error.value = e.message
+        }
+    }
+
+    if (error.value != null) {
+        Text("Error: ${error.value}", color = MaterialTheme.colors.error)
+        return
+    } else if (user == null) {
+        CircularProgressIndicator()
+        return
+    }
 
     Box(
         modifier = Modifier
@@ -38,7 +65,7 @@ fun HomeScreen(onNavigate: (Screen) -> Unit) {
                     .padding(16.dp)
             ) {
                 Text(
-                    text = "Avamaco",
+                    text = user!!.username,
                     fontSize = 24.sp
                 )
                 IconButton(
@@ -59,7 +86,7 @@ fun HomeScreen(onNavigate: (Screen) -> Unit) {
                     .fillMaxWidth()
             ) {
                 Box(modifier = Modifier.weight(1f)) {
-                    PartiesList({ showAddPartyDialog = true })
+                    PartiesList({ showAddPartyDialog = true }, userId, onSetParty, onNavigate)
                 }
                 Box(modifier = Modifier.weight(1f)) {
                     FriendsList({ showAddFriendDialog = true })
@@ -72,7 +99,12 @@ fun HomeScreen(onNavigate: (Screen) -> Unit) {
         if (showAddPartyDialog) {
             TextFieldDialog(
                 question = "Enter party name",
-                onAccept = { showAddPartyDialog = false },
+                onAccept = {partyName: String ->
+                    CoroutineScope(Dispatchers.IO).launch {
+                        createParty(userId, partyName)
+                    }
+                    showAddPartyDialog = false
+                },
                 onDismiss = { showAddPartyDialog = false }
             )
         }
@@ -113,7 +145,7 @@ fun LogoutDialog(onDismiss: () -> Unit, onLogout: () -> Unit) {
 }
 
 @Composable
-fun TextFieldDialog(question: String, onAccept: () -> Unit, onDismiss: () -> Unit) {
+fun TextFieldDialog(question: String, onAccept: (String) -> Unit, onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
         var text by remember { mutableStateOf("") }
         Box(
@@ -132,7 +164,7 @@ fun TextFieldDialog(question: String, onAccept: () -> Unit, onDismiss: () -> Uni
                     onValueChange = { text = it },
                     label = { Text("Name") }
                 )
-                Button(onClick = onAccept) {
+                Button(onClick = { onAccept(text) }) {
                     Text("Accept")
                 }
                 Button(onClick = onDismiss) {
@@ -189,6 +221,31 @@ fun PrettyListContent(content: List<@Composable () -> Unit>) {
 }
 
 @Composable
+fun PartyCard(party: Party, onSetParty: (Party) -> Unit, onNavigate: (Screen) -> Unit) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(
+            text = party.name
+        )
+        IconButton(
+            onClick = {
+                onSetParty(party)
+                onNavigate(Screen.Party)
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Default.Info,
+                contentDescription = "Info",
+                tint = MaterialTheme.colors.primary
+            )
+        }
+    }
+}
+
+@Composable
 fun PrettyList(name: String,
                showButton: Boolean,
                buttonDescription: String = "",
@@ -206,12 +263,16 @@ fun PrettyList(name: String,
 }
 
 @Composable
-fun PartiesList(onButtonClick: () -> Unit) {
-    val listOfParties = listOf<@Composable () -> Unit>(
-        { Text("Party1")},
-        { Text("Party2")},
-        { Text("Party3")}
-    )
+fun PartiesList(onButtonClick: () -> Unit, userId: String, onSetParty: (Party) -> Unit, onNavigate: (Screen) -> Unit) {
+    var parties by remember { mutableStateOf<List<Party>?>(null) }
+    LaunchedEffect(Unit) {
+        parties = fetchParties(userId)
+    }
+    if (parties == null) {
+        return
+    }
+
+    val listOfParties = parties!!.map { party: Party -> @Composable{ PartyCard(party, onSetParty, onNavigate) } }
     PrettyList("Parties", true, "Create party", onButtonClick, listOfParties)
 }
 
