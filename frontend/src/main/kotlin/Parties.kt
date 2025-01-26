@@ -21,6 +21,13 @@ suspend fun fetchParties(userId: String): List<Party> {
     }.body() // ListSerializer(Party.serializer()) is applied automatically
 }
 
+suspend fun fetchParty(partyId: Long): Party {
+    val url = "http://localhost:8080/party/$partyId"
+    return client.get(url) {
+        contentType(ContentType.Application.Json)
+    }.body()
+}
+
 suspend fun createParty(userId: String, partyName: String): String {
     var responseMessage: String
     try {

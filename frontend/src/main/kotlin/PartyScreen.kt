@@ -8,15 +8,32 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
 
 @Composable
 fun PartyScreen(party: Party, onNavigate: (Screen) -> Unit) {
+    var localParty by remember { mutableStateOf(party) }
     var showAddMemberDialog by remember { mutableStateOf(false) }
+
+    fun reloadParty() {
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                localParty = fetchParty(party.id)
+                println (localParty.name)
+            } catch (e: Exception) {
+                // Handle error
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -35,9 +52,19 @@ fun PartyScreen(party: Party, onNavigate: (Screen) -> Unit) {
                     .padding(16.dp)
             ) {
                 Text(
-                    text = party.name,
+                    text = localParty.name,
                     fontSize = 24.sp
                 )
+                IconButton(
+                    onClick = { reloadParty() },
+                    modifier = Modifier.background(MaterialTheme.colors.secondary, CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Refresh party",
+                        tint = MaterialTheme.colors.primary
+                    )
+                }
                 IconButton(
                     onClick = { onNavigate(Screen.Home) },
                     modifier = Modifier.background(MaterialTheme.colors.secondary, CircleShape)
