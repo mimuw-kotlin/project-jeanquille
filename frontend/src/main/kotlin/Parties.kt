@@ -49,3 +49,8 @@ suspend fun createParty(userId: String, partyName: String): String {
     }
     return responseMessage
 }
+
+suspend fun addMember(partyId: Long, friendId: String): HttpResponse {
+    val response: HttpResponse = client.post("http://localhost:8080/party/$partyId/member/$friendId")
+    return response
+}

@@ -41,7 +41,7 @@ fun App() {
                 onNavigate = { screen -> currentScreen = screen },
                 onSetParty = { party -> currentParty = party}
             )
-            Screen.Party -> PartyScreen(currentParty!!) { screen -> currentScreen = screen }
+            Screen.Party -> PartyScreen(currentParty!!, currentUser) { screen -> currentScreen = screen }
             Screen.Register -> RegisterScreen { screen -> currentScreen = screen }
         }
     }
