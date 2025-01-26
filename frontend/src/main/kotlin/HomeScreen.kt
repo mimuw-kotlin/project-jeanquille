@@ -9,10 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -28,6 +26,7 @@ fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party)
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showAddPartyDialog by remember { mutableStateOf(false) }
     var showAddFriendDialog by remember { mutableStateOf(false) }
+    var removedFriend: Account? by remember { mutableStateOf(null) }
     var user: Account? by remember { mutableStateOf(null) }
 
     val error = remember { mutableStateOf<String?>(null) }
@@ -89,7 +88,7 @@ fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party)
                     PartiesList({ showAddPartyDialog = true }, userId, onSetParty, onNavigate)
                 }
                 Box(modifier = Modifier.weight(1f)) {
-                    FriendsList({ showAddFriendDialog = true })
+                    FriendsList({ showAddFriendDialog = true }, userId, { friend -> removedFriend = friend })
                 }
             }
         }
@@ -111,15 +110,27 @@ fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party)
         if (showAddFriendDialog) {
             TextFieldDialog(
                 question = "Enter friend name",
-                onAccept = { showAddFriendDialog = false },
+                onAccept = {friendName: String ->
+                    CoroutineScope(Dispatchers.IO).launch {
+                        addFriend(userId, friendName)
+                    }
+                    showAddFriendDialog = false
+                },
                 onDismiss = { showAddFriendDialog = false }
+            )
+        }
+        if (removedFriend != null) {
+            RemoveFriendDialog(
+                { removedFriend = null },
+                user!!.id,
+                removedFriend!!
             )
         }
     }
 }
 
 @Composable
-fun LogoutDialog(onDismiss: () -> Unit, onLogout: () -> Unit) {
+fun YesNoDialog(question: String, yesAnswer: String, noAnswer: String, onAccept: () -> Unit, onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
         Box(
             modifier = Modifier
@@ -131,17 +142,44 @@ fun LogoutDialog(onDismiss: () -> Unit, onLogout: () -> Unit) {
                     .background(color = MaterialTheme.colors.background, RoundedCornerShape(16.dp))
                     .padding(16.dp)
             ) {
-                Text(text = "Do you really want to log out?")
+                Text(text = question)
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = onLogout) {
-                    Text("Log out")
+                Button(onClick = onAccept) {
+                    Text(yesAnswer)
                 }
                 Button(onClick = onDismiss) {
-                    Text("Cancel")
+                    Text(noAnswer)
                 }
             }
         }
     }
+}
+
+@Composable
+fun LogoutDialog(onDismiss: () -> Unit, onLogout: () -> Unit) {
+    YesNoDialog(
+        "Do you really want to log out?",
+        "Log out",
+        "Cancel",
+        onLogout,
+        onDismiss
+    )
+}
+
+@Composable
+fun RemoveFriendDialog(onDismiss: () -> Unit, userId: String, friend: Account) {
+    YesNoDialog(
+        "Do you really want to unfriend ${friend.username}?",
+        "Yes",
+        "No",
+        {
+            GlobalScope.launch {
+                removeFriend(userId, friend.id)
+            }
+            onDismiss()
+        },
+        onDismiss
+    )
 }
 
 @Composable
@@ -246,6 +284,40 @@ fun PartyCard(party: Party, onSetParty: (Party) -> Unit, onNavigate: (Screen) ->
 }
 
 @Composable
+fun FriendCard(friend: Account, onRemoveFriend: (Account) -> Unit) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(
+            text = friend.username
+        )
+        if (friend.phoneNumber != "") {
+            Row {
+                Icon(
+                    imageVector = Icons.Default.Phone,
+                    contentDescription = "Phone number",
+                    tint = MaterialTheme.colors.primary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(friend.phoneNumber)
+            }
+        }
+
+        IconButton(
+            onClick = { onRemoveFriend(friend) }
+        ) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Unfriend",
+                tint = MaterialTheme.colors.primary
+            )
+        }
+    }
+}
+
+@Composable
 fun PrettyList(name: String,
                showButton: Boolean,
                buttonDescription: String = "",
@@ -277,11 +349,15 @@ fun PartiesList(onButtonClick: () -> Unit, userId: String, onSetParty: (Party) -
 }
 
 @Composable
-fun FriendsList(onButtonClick: () -> Unit) {
-    val listOfFriends = listOf<@Composable () -> Unit>(
-        { Text("Żonkil")},
-        { Text("Mati")},
-        { Text("Kwiatek")}
-    )
+fun FriendsList(onButtonClick: () -> Unit, userId: String, onRemoveFriend: (Account) -> Unit) {
+    var friends by remember { mutableStateOf<List<Account>?>(null) }
+    LaunchedEffect(Unit) {
+        friends = fetchFriends(userId)
+    }
+    if (friends == null) {
+        return
+    }
+
+    val listOfFriends = friends!!.map { friend: Account -> @Composable{ FriendCard(friend, onRemoveFriend) } }
     PrettyList("Friends", true, "Add friend", onButtonClick, listOfFriends)
 }

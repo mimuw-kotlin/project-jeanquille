@@ -23,11 +23,6 @@ data class LoginResult(
     val errorMessage: String = ""
 )
 
-suspend fun fetchFriends(): List<Account> {
-    return client.get("http://localhost:8080/friends").body()
-}
-
-
 suspend fun registerUser(username: String, password: String, phoneNumber: String): String {
     var responseMessage: String
     try {
@@ -80,4 +75,21 @@ suspend fun fetchAccount(userId: String): Account {
     return client.get(url) {
         contentType(ContentType.Application.Json)
     }.body()
+}
+
+suspend fun addFriend(userId: String, friendName: String): HttpResponse {
+    val response: HttpResponse = client.post("http://localhost:8080/friends/$userId/add/$friendName")
+    return response
+}
+
+suspend fun removeFriend(userId: String, friendId: String): HttpResponse {
+    val response: HttpResponse = client.post("http://localhost:8080/friends/$userId/unfriend/$friendId")
+    return response
+}
+
+suspend fun fetchFriends(userId: String): List<Account> {
+    val url = "http://localhost:8080/friends/$userId"
+    return client.get(url) {
+        contentType(ContentType.Application.Json)
+    }.body() // ListSerializer(Party.serializer()) is applied automatically
 }
