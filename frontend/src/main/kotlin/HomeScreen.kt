@@ -136,16 +136,22 @@ fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party)
             )
         }
         if (showAddFriendDialog) {
+            var showError : String? by remember { mutableStateOf(null) }
             TextFieldDialog(
                 question = "Enter friend name",
                 onAccept = {friendName: String ->
                     CoroutineScope(Dispatchers.IO).launch {
-                        addFriend(userId, friendName)
-                        reloadHome()
+                        try {
+                            addFriend(userId, friendName)
+                            reloadHome()
+                            showAddFriendDialog = false
+                        } catch (e: Exception) {
+                            showError = e.message
+                        }
                     }
-                    showAddFriendDialog = false
                 },
-                onDismiss = { showAddFriendDialog = false }
+                onDismiss = { showAddFriendDialog = false },
+                error = showError
             )
         }
         if (removedFriend != null) {

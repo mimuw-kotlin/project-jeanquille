@@ -81,7 +81,11 @@ suspend fun fetchAccount(userId: String): Account {
 
 suspend fun addFriend(userId: String, friendName: String): HttpResponse {
     val response: HttpResponse = client.post("http://localhost:8080/friends/$userId/add/$friendName")
-    return response
+    if (response.status == HttpStatusCode.OK) {
+        return response
+    } else {
+        throw Exception("Failed to add friend: ${response.body<Map<String, String>>()["message"]}")
+    }
 }
 
 suspend fun removeFriend(userId: String, friendId: String): HttpResponse {

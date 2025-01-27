@@ -42,7 +42,7 @@ fun YesNoDialog(question: String, yesAnswer: String, noAnswer: String, onAccept:
 }
 
 @Composable
-fun TextFieldDialog(question: String, onAccept: (String) -> Unit, onDismiss: () -> Unit) {
+fun TextFieldDialog(question: String, onAccept: (String) -> Unit, onDismiss: () -> Unit, error: String? = null) {
     Dialog(onDismissRequest = onDismiss) {
         var text by remember { mutableStateOf("") }
         Box(
@@ -66,6 +66,9 @@ fun TextFieldDialog(question: String, onAccept: (String) -> Unit, onDismiss: () 
                 }
                 Button(onClick = onDismiss) {
                     Text("Cancel")
+                }
+                if (error != null) {
+                    Text(error, color = MaterialTheme.colors.error)
                 }
             }
         }
