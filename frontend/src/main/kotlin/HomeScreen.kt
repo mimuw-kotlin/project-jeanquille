@@ -27,6 +27,17 @@ fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party)
 
     val error = remember { mutableStateOf<String?>(null) }
 
+    fun reloadHome() {
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                parties = fetchParties(userId)
+                friends = fetchFriends(userId)
+            } catch (e: Exception) {
+                // Handle error
+            }
+        }
+    }
+
     LaunchedEffect(Unit) {
         friends = fetchFriends(userId)
         parties = fetchParties(userId)
@@ -117,6 +128,7 @@ fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party)
                 onAccept = {partyName: String ->
                     CoroutineScope(Dispatchers.IO).launch {
                         createParty(userId, partyName)
+                        reloadHome()
                     }
                     showAddPartyDialog = false
                 },
@@ -129,6 +141,7 @@ fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party)
                 onAccept = {friendName: String ->
                     CoroutineScope(Dispatchers.IO).launch {
                         addFriend(userId, friendName)
+                        reloadHome()
                     }
                     showAddFriendDialog = false
                 },
@@ -139,7 +152,8 @@ fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party)
             RemoveFriendDialog(
                 { removedFriend = null },
                 user!!.id,
-                removedFriend!!
+                removedFriend!!,
+                { reloadHome() }
             )
         }
     }
@@ -157,14 +171,15 @@ fun LogoutDialog(onDismiss: () -> Unit, onLogout: () -> Unit) {
 }
 
 @Composable
-fun RemoveFriendDialog(onDismiss: () -> Unit, userId: String, friend: Account) {
+fun RemoveFriendDialog(onDismiss: () -> Unit, userId: String, friend: Account, reloadHome: () -> Unit) {
     YesNoDialog(
         "Do you really want to unfriend ${friend.username}?",
         "Yes",
         "No",
         {
-            GlobalScope.launch {
+            CoroutineScope(Dispatchers.IO).launch {
                 removeFriend(userId, friend.id)
+                reloadHome()
             }
             onDismiss()
         },
