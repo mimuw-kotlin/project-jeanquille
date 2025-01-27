@@ -21,6 +21,7 @@ fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party)
     var showAddPartyDialog by remember { mutableStateOf(false) }
     var showAddFriendDialog by remember { mutableStateOf(false) }
     var removedFriend: Account? by remember { mutableStateOf(null) }
+    var deletedParty: Party? by remember { mutableStateOf(null) }
     var user: Account? by remember { mutableStateOf(null) }
     var friends by remember { mutableStateOf<List<Account>?>(null) }
     var parties by remember { mutableStateOf<List<Party>?>(null) }
@@ -112,7 +113,7 @@ fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party)
                     .fillMaxWidth()
             ) {
                 Box(modifier = Modifier.weight(1f)) {
-                    PartiesList(parties, { showAddPartyDialog = true }, onSetParty, onNavigate)
+                    PartiesList(parties, { showAddPartyDialog = true }, onSetParty, onNavigate, { party -> deletedParty = party })
                 }
                 Box(modifier = Modifier.weight(1f)) {
                     FriendsList(friends, { showAddFriendDialog = true }, { friend -> removedFriend = friend })
@@ -156,6 +157,13 @@ fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party)
                 { reloadHome() }
             )
         }
+        if (deletedParty != null) {
+            DeletePartyDialog(
+                { deletedParty = null },
+                deletedParty!!,
+                { reloadHome() }
+            )
+        }
     }
 }
 
@@ -188,7 +196,24 @@ fun RemoveFriendDialog(onDismiss: () -> Unit, userId: String, friend: Account, r
 }
 
 @Composable
-fun PartyCard(party: Party, onSetParty: (Party) -> Unit, onNavigate: (Screen) -> Unit) {
+fun DeletePartyDialog(onDismiss: () -> Unit, party: Party, reloadHome: () -> Unit) {
+    YesNoDialog(
+        "Do you really want to delete party ${party.name}?",
+        "Yes",
+        "No",
+        {
+            CoroutineScope(Dispatchers.IO).launch {
+                deleteParty(party.id)
+                reloadHome()
+            }
+            onDismiss()
+        },
+        onDismiss
+    )
+}
+
+@Composable
+fun PartyCard(party: Party, onSetParty: (Party) -> Unit, onNavigate: (Screen) -> Unit, onDeleteParty: (Party) -> Unit) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -197,17 +222,30 @@ fun PartyCard(party: Party, onSetParty: (Party) -> Unit, onNavigate: (Screen) ->
         Text(
             text = party.name
         )
-        IconButton(
-            onClick = {
-                onSetParty(party)
-                onNavigate(Screen.Party)
+        Row {
+            IconButton(
+                onClick = {
+                    onSetParty(party)
+                    onNavigate(Screen.Party)
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = "Info",
+                    tint = MaterialTheme.colors.primary
+                )
             }
-        ) {
-            Icon(
-                imageVector = Icons.Default.Info,
-                contentDescription = "Info",
-                tint = MaterialTheme.colors.primary
-            )
+            IconButton(
+                onClick = {
+                    onDeleteParty(party)
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete party",
+                    tint = MaterialTheme.colors.primary
+                )
+            }
         }
     }
 }
@@ -247,12 +285,12 @@ fun FriendCard(friend: Account, onRemoveFriend: (Account) -> Unit) {
 }
 
 @Composable
-fun PartiesList(parties: List<Party>?, onButtonClick: () -> Unit, onSetParty: (Party) -> Unit, onNavigate: (Screen) -> Unit) {
+fun PartiesList(parties: List<Party>?, onButtonClick: () -> Unit, onSetParty: (Party) -> Unit, onNavigate: (Screen) -> Unit, onDeleteParty: (Party) -> Unit) {
     if (parties == null) {
         return
     }
 
-    val listOfParties = parties!!.map { party: Party -> @Composable{ PartyCard(party, onSetParty, onNavigate) } }
+    val listOfParties = parties!!.map { party: Party -> @Composable{ PartyCard(party, onSetParty, onNavigate, onDeleteParty) } }
     PrettyList("Parties", true, "Create party", onButtonClick, listOfParties)
 }
 

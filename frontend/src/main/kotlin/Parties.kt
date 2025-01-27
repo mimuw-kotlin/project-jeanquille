@@ -80,3 +80,8 @@ suspend fun sumup(partyId: Long): HttpResponse {
     val response: HttpResponse = client.post("http://localhost:8080/party/$partyId/sumup")
     return response
 }
+
+suspend fun deleteParty(partyId: Long): HttpResponse {
+    val response: HttpResponse = client.delete("http://localhost:8080/party/$partyId")
+    return response
+}
