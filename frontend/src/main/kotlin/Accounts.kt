@@ -62,8 +62,10 @@ suspend fun loginUser(username: String, password: String): LoginResult {
             var userId: String = response.body()
             userId = userId.substring(1, userId.length - 1) // cut quote marks
             return LoginResult(true, uuid = userId)
+        } else if (response.status == HttpStatusCode.Unauthorized) {
+            return LoginResult(false, errorMessage = "Invalid credentials")
         } else {
-            return LoginResult(false, errorMessage = response.status.toString())
+            return LoginResult(false, errorMessage = "Login failed: ${response.status}")
         }
     } catch (e: Exception) {
         return  LoginResult(false, errorMessage = e.message ?: "empty error message")

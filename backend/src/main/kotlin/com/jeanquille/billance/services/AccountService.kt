@@ -30,6 +30,6 @@ class AccountService(val accountRepository: AccountRepository) {
         if (BCryptPasswordEncoder().matches(password, account.password)) {
             return account.id!!
         }
-        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid credentials")
+        throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials")
     }
 }
