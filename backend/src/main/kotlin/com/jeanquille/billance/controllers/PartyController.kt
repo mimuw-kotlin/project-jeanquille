@@ -1,16 +1,14 @@
 package com.jeanquille.billance.controllers
 
 import com.jeanquille.billance.dto.BillDto
-import com.jeanquille.billance.models.Bill
 import com.jeanquille.billance.models.Party
+import com.jeanquille.billance.models.Transaction
 import com.jeanquille.billance.services.PartyService
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDateTime
 import java.util.*
 
-
 @RestController
-class PartyController (private val partyService: PartyService) {
+class PartyController(private val partyService: PartyService) {
 
     @GetMapping("/parties/{accountId}")
     fun getParties(@PathVariable accountId: UUID): List<Party> = partyService.getPartiesByAccountId(accountId)
@@ -18,24 +16,17 @@ class PartyController (private val partyService: PartyService) {
     @GetMapping("/party/{partyId}")
     fun getParty(@PathVariable partyId: Long): Party = partyService.getPartyById(partyId)
 
-    @GetMapping("/parties")
-    fun getAllParties(): List<Party> = partyService.getAllParties()
-
-    @PutMapping("/party/{partyId}/name")
-    fun updatePartyName(@PathVariable partyId: Long, @RequestBody json: Map<String, String>): Party {
-        return partyService.updateParty(partyId, json["name"]!!)
-    }
-
     @DeleteMapping("/party/{partyId}")
     fun deleteParty(@PathVariable partyId: Long) {
         partyService.deleteParty(partyId)
     }
 
     @PostMapping("/party/{creatorId}")
-    fun createParty(@PathVariable creatorId: UUID): Party {
-        val party = Party()
+    fun createParty(@PathVariable creatorId: UUID, @RequestBody json: Map<String, String>) {
+        val partyName = json["name"] ?: throw IllegalArgumentException("Name is required")
+        val party = Party(name = partyName)
 
-        return partyService.createParty(party, creatorId)
+        partyService.createParty(party, creatorId)
     }
 
     @PostMapping("/party/{partyId}/member/{accountId}")
@@ -46,5 +37,10 @@ class PartyController (private val partyService: PartyService) {
     @PostMapping("/party/{partyId}/bill")
     fun addBill(@PathVariable partyId: Long, @RequestBody billDto: BillDto): Party {
         return partyService.addBill(billDto.toBill(partyId))
+    }
+
+    @PostMapping("/party/{partyId}/sumup")
+    fun sumUp(@PathVariable partyId: Long): MutableList<Transaction> {
+        return partyService.sumUpParty(partyId)
     }
 }

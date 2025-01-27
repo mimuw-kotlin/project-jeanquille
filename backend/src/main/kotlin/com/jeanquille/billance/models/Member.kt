@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference
 import jakarta.persistence.*
 
 @Entity
-class Member (
+class Member(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
@@ -19,4 +19,4 @@ class Member (
     var party: Party,
 
     var balance: Long = 0
-    )
+)

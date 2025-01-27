@@ -2,6 +2,7 @@ package com.jeanquille.billance.controllers
 
 import com.jeanquille.billance.dto.AccountPostDto
 import com.jeanquille.billance.models.Account
+import com.jeanquille.billance.models.LoginRequest
 import com.jeanquille.billance.services.AccountService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -13,19 +14,20 @@ import java.util.UUID
 @RestController
 class AccountController(private val accountService: AccountService) {
 
-    @GetMapping("/accounts")
-    fun getAllAccounts(): MutableList<Account> = accountService.getAllAccounts()
-
-//    @PostMapping("/account/{username}")
-//    fun createAccount(@PathVariable username: String): Account {
-//        return accountService.createAccount(username)
-//    }
+    private val lock = Any()
 
     @GetMapping("/account/{accountId}")
     fun getAccount(@PathVariable accountId: UUID): Account = accountService.getAccount(accountId)
 
-    @PostMapping("/account")
+    @PostMapping("/register")
     fun createAccount(@RequestBody accountPostDto: AccountPostDto) {
-        accountService.createAccount(accountPostDto.toAccount())
+        synchronized(lock) {
+            accountService.createAccount(accountPostDto.toAccount())
+        }
+    }
+
+    @PostMapping("/login")
+    fun login(@RequestBody loginRequest: LoginRequest): UUID {
+        return accountService.login(loginRequest.username, loginRequest.password)
     }
 }

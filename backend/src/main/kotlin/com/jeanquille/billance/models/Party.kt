@@ -5,7 +5,7 @@ import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
-class Party (
+class Party(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
@@ -19,6 +19,7 @@ class Party (
     var members: MutableList<Member> = mutableListOf(),
 
     @OneToMany(mappedBy = "party", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JsonManagedReference
     var transactions: MutableList<Transaction> = mutableListOf(),
 
     @OneToMany(mappedBy = "party", cascade = [CascadeType.ALL], orphanRemoval = true)
