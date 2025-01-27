@@ -22,5 +22,24 @@ In the first part we're going to implement backend.
 
 In the second part we're going to implement frontend.
 
-## Libraries
-- *to be added*
+## Frameworks and libraries
+- Spring Boot
+- Compose for Desktop
+- Ktor
+ 
+## Preqrequisites
+- Java 21
+- docker-compose
+
+## How to run
+```
+cd docker
+docker-compose up -d
+cd ../backend
+./gradlew build
+./gradlew bootRun
+cd ../frontend
+./gradlew build
+./gradlew run
+```
+
