@@ -57,8 +57,9 @@ fun LoginScreen(onNavigate: (Screen) -> Unit, onSetUser: (String) -> Unit) {
             TextField(
                 value = username,
                 onValueChange = { newValue ->
-                    if (validName(newValue))
+                    if (validName(newValue)) {
                         username = newValue
+                    }
                 },
                 label = { Text("Username") },
                 modifier = Modifier
@@ -80,8 +81,9 @@ fun LoginScreen(onNavigate: (Screen) -> Unit, onSetUser: (String) -> Unit) {
             TextField(
                 value = password,
                 onValueChange = { newValue ->
-                    if (validName(newValue))
+                    if (validName(newValue)) {
                         password = newValue
+                    }
                 },
                 label = { Text("Password") },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -136,9 +138,9 @@ fun LoginScreen(onNavigate: (Screen) -> Unit, onSetUser: (String) -> Unit) {
                 if (response!!.success) {
                     onSetUser(response!!.uuid)
                     onNavigate(Screen.Home)
-                }
-                else
+                } else {
                     Text("Error: ${response!!.errorMessage}")
+                }
             }
         }
         Button(

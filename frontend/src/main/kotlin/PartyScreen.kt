@@ -26,9 +26,9 @@ fun PartyScreen(party: Party, userId: String, onNavigate: (Screen) -> Unit) {
     var localParty by remember { mutableStateOf(party) }
     var showAddMemberDialog by remember { mutableStateOf(false) }
     var showAddBillDialog by remember { mutableStateOf(false) }
-    var showTransactionInfoDialog : Transaction? by remember { mutableStateOf(null) }
-    var showBillInfoDialog : Bill? by remember { mutableStateOf(null) }
-    var showBillRemoveDialog : Bill? by remember { mutableStateOf(null) }
+    var showTransactionInfoDialog: Transaction? by remember { mutableStateOf(null) }
+    var showBillInfoDialog: Bill? by remember { mutableStateOf(null) }
+    var showBillRemoveDialog: Bill? by remember { mutableStateOf(null) }
     var showMemberRemoveDialog: Member? by remember { mutableStateOf(null) }
     var friends by remember { mutableStateOf<List<Account>?>(null) }
 
@@ -120,9 +120,9 @@ fun PartyScreen(party: Party, userId: String, onNavigate: (Screen) -> Unit) {
         if (showTransactionInfoDialog != null) {
             InfoDialog(
                 text = "Payer: " + showTransactionInfoDialog!!.payer.username + "\n" +
-                        "Receiver: " + showTransactionInfoDialog!!.receiver.username + "\n" +
-                        "Amount: " + showTransactionInfoDialog!!.amount + "\n" +
-                        "Receiver phone number: " + showTransactionInfoDialog!!.receiver.phoneNumber,
+                    "Receiver: " + showTransactionInfoDialog!!.receiver.username + "\n" +
+                    "Amount: " + showTransactionInfoDialog!!.amount + "\n" +
+                    "Receiver phone number: " + showTransactionInfoDialog!!.receiver.phoneNumber,
 
                 onDismiss = { showTransactionInfoDialog = null }
             )
@@ -131,10 +131,10 @@ fun PartyScreen(party: Party, userId: String, onNavigate: (Screen) -> Unit) {
         if (showBillInfoDialog != null) {
             InfoDialog(
                 text = "Name: " + showBillInfoDialog!!.name + "\n" +
-                        "Date: " + showBillInfoDialog!!.date + "\n" +
-                        "Amount: " + (showBillInfoDialog!!.amount.toDouble() / 100) + "zł\n" +
-                        "Payer: " + showBillInfoDialog!!.payer.username + "\n" +
-                        "Participants: " + showBillInfoDialog!!.participants.map { it.username }.joinToString(", "),
+                    "Date: " + showBillInfoDialog!!.date + "\n" +
+                    "Amount: " + (showBillInfoDialog!!.amount.toDouble() / 100) + "zł\n" +
+                    "Payer: " + showBillInfoDialog!!.payer.username + "\n" +
+                    "Participants: " + showBillInfoDialog!!.participants.map { it.username }.joinToString(", "),
 
                 onDismiss = { showBillInfoDialog = null }
             )
@@ -152,7 +152,7 @@ fun PartyScreen(party: Party, userId: String, onNavigate: (Screen) -> Unit) {
                 },
                 onDismiss = { showBillRemoveDialog = null },
                 yesAnswer = "Yes",
-                noAnswer = "No",
+                noAnswer = "No"
             )
         }
 
@@ -168,7 +168,7 @@ fun PartyScreen(party: Party, userId: String, onNavigate: (Screen) -> Unit) {
                 },
                 onDismiss = { showMemberRemoveDialog = null },
                 yesAnswer = "Yes",
-                noAnswer = "No",
+                noAnswer = "No"
             )
         }
         if (showAddBillDialog) {
@@ -195,8 +195,9 @@ fun AddMemberDialog(onDismiss: () -> Unit, party: Party, friends: List<Account>,
             ) {
                 Text(text = "Choose a friend to add")
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = { expanded = !expanded },
-                    ) {
+                Button(
+                    onClick = { expanded = !expanded }
+                ) {
                     Text(chosenOption?.username ?: "Click here to choose")
                 }
                 DropdownMenu(
@@ -218,8 +219,7 @@ fun AddMemberDialog(onDismiss: () -> Unit, party: Party, friends: List<Account>,
                     onClick = {
                         if (chosenOption == null) {
                             showError = true
-                        }
-                        else {
+                        } else {
                             CoroutineScope(Dispatchers.Default).launch {
                                 addMember(party.id, chosenOption!!.id)
                                 reloadParty()
@@ -276,7 +276,8 @@ fun AddBillDialog(onDismiss: () -> Unit, party: Party, reloadParty: () -> Unit) 
                     onValueChange = { amount = it },
                     label = { Text("Amount") }
                 )
-                Button(onClick = { expanded = !expanded },
+                Button(
+                    onClick = { expanded = !expanded }
                 ) {
                     Text(payer?.username ?: "Click here to choose payer")
                 }
@@ -305,18 +306,18 @@ fun AddBillDialog(onDismiss: () -> Unit, party: Party, reloadParty: () -> Unit) 
                                 onCheckedChange = {
                                     if (it) {
                                         participants.add(member.account.id)
-                                    }
-                                    else {
+                                    } else {
                                         participants.remove(member.account.id)
                                     }
                                     checked = !checked
-                                },
+                                }
                             )
                         }
                     }
                 }
 
-                Button(onClick = {
+                Button(
+                    onClick = {
                         CoroutineScope(Dispatchers.Default).launch {
                             addBill(party.id, billName, (amount.toDouble() * 100).roundToLong(), payer!!.id, participants.toList())
                             reloadParty()
@@ -337,20 +338,20 @@ fun AddBillDialog(onDismiss: () -> Unit, party: Party, reloadParty: () -> Unit) 
 
 @Composable
 fun MembersList(onButtonClick: () -> Unit, party: Party, onRemoveMember: (Member) -> Unit) {
-    val listOfMembers = party.members.map { member: Member -> @Composable{ MemberCard(member, onRemoveMember) } }
+    val listOfMembers = party.members.map { member: Member -> @Composable { MemberCard(member, onRemoveMember) } }
 
     PrettyList("Members", true, "Add member", onButtonClick, listOfMembers)
 }
 
 @Composable
 fun BillsList(onButtonClick: () -> Unit, party: Party, onInfoClick: (Bill) -> Unit, onRemoveBill: (Bill) -> Unit) {
-    val listOfBills = party.bills.map { bill: Bill -> @Composable{ BillCard(bill, onInfoClick, onRemoveBill ) } }
+    val listOfBills = party.bills.map { bill: Bill -> @Composable { BillCard(bill, onInfoClick, onRemoveBill) } }
     PrettyList("Bills", true, "Add bill", onButtonClick, listOfBills)
 }
 
 @Composable
 fun TransactionsList(party: Party, onButtonClick: (Transaction) -> Unit, onSumup: () -> Unit) {
-    val listOfTransactions = party.transactions.map { transaction: Transaction -> @Composable{ TransactionCard(transaction, onButtonClick) } }
+    val listOfTransactions = party.transactions.map { transaction: Transaction -> @Composable { TransactionCard(transaction, onButtonClick) } }
     PrettyList("Transactions", true, "Sumup", onSumup, listOfTransactions, Icons.Default.Refresh)
 }
 
@@ -362,7 +363,7 @@ fun TransactionCard(transaction: Transaction, onButtonClick: (Transaction) -> Un
         modifier = Modifier.fillMaxSize()
     ) {
         Text(
-            text = "${transaction.payer.username} owes ${transaction.receiver.username} ${(transaction.amount.toDouble() / 100)} zł",
+            text = "${transaction.payer.username} owes ${transaction.receiver.username} ${(transaction.amount.toDouble() / 100)} zł"
         )
 
         IconButton(

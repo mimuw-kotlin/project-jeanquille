@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class BillanceApplication
 
 fun main(args: Array<String>) {
-	runApplication<BillanceApplication>(*args)
+    runApplication<BillanceApplication>(*args)
 }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface TransactionRepository: JpaRepository<Transaction, Long> {
+interface TransactionRepository : JpaRepository<Transaction, Long> {
     @Transactional
     fun deleteByPartyId(partyId: Long)
     fun getTransactionById(transactionId: Long): Optional<Transaction>

@@ -1,7 +1,5 @@
 package com.jeanquille.billance.controllers
 
-import com.jeanquille.billance.models.Bill
-import com.jeanquille.billance.services.BillService
 import com.jeanquille.billance.services.MemberService
 import org.springframework.web.bind.annotation.*
 

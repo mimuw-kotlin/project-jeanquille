@@ -31,7 +31,7 @@ class PartyService(
     }
 
     fun createParty(party: Party, creatorId: UUID) {
-        val member = Member(party=party, account=Account(id=creatorId))
+        val member = Member(party = party, account = Account(id = creatorId))
         party.members.add(member)
 
         partyRepository.save(party)
@@ -40,12 +40,12 @@ class PartyService(
         partyRepository.deleteById(partyId)
     }
 
-    fun addMember(partyId: Long, accountId: UUID) : Party {
+    fun addMember(partyId: Long, accountId: UUID): Party {
         val party = partyRepository.findById(partyId).orElseThrow()
         if (party.members.any { it.account.id == accountId }) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "Account is already a member of this party")
         }
-        val member = Member(party=party, account=Account(id=accountId))
+        val member = Member(party = party, account = Account(id = accountId))
         party.members.add(member)
         return partyRepository.save(party)
     }
@@ -102,8 +102,14 @@ class PartyService(
                 payersBalances[payerIndex] += amount
                 receiversBalances[receiverIndex] -= amount
 
-                transactions.add(Transaction(party=party,
-                    payer=payers[payerIndex].account, receiver=receivers[receiverIndex].account, amount=amount))
+                transactions.add(
+                    Transaction(
+                        party = party,
+                        payer = payers[payerIndex].account,
+                        receiver = receivers[receiverIndex].account,
+                        amount = amount
+                    )
+                )
 
                 if (payersBalances[payerIndex] == 0L) {
                     payerIndex--
@@ -112,13 +118,11 @@ class PartyService(
                     receiverIndex--
                 }
             }
-
-
         }
         return transactionRepository.saveAll(transactions)
     }
 
-    //assumes that balances sum up to 0
+    // assumes that balances sum up to 0
     private fun recursiveSplit(members: MutableList<Member>): MutableList<MutableList<Member>> {
         val n = members.size
         if (n == 0) {
@@ -127,7 +131,7 @@ class PartyService(
         val maxSum = members.filter { it.balance > 0 }.sumOf { it.balance.toInt() }
         val m = maxSum + 1
 
-        if (n * m  > 10000000) {
+        if (n * m > 10000000) {
             return mutableListOf(members)
         }
 
@@ -140,7 +144,7 @@ class PartyService(
         for (i in 1 until n) {
             for (j in 0 until m) {
                 val k = j - members[i].balance.toInt()
-                dp[i][j] = dp[i-1][j] || (k in 0..<m && dp[i-1][k])
+                dp[i][j] = dp[i - 1][j] || (k in 0..<m && dp[i - 1][k])
             }
         }
         if (!dp[n-1][0]) {
@@ -154,7 +158,7 @@ class PartyService(
         var j = 0
 
         while (i > 0) {
-            if (dp[i-1][j]) {
+            if (dp[i - 1][j]) {
                 subNotAll = true
             } else {
                 subRes.add(members[i])

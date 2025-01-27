@@ -12,7 +12,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -96,7 +95,7 @@ fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party)
                     )
                 }
                 IconButton(
-                    onClick = {showLogoutDialog = true},
+                    onClick = { showLogoutDialog = true },
                     modifier = Modifier.background(MaterialTheme.colors.secondary, CircleShape)
                 ) {
                     Icon(
@@ -126,7 +125,7 @@ fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party)
         if (showAddPartyDialog) {
             TextFieldDialog(
                 question = "Enter party name",
-                onAccept = {partyName: String ->
+                onAccept = { partyName: String ->
                     CoroutineScope(Dispatchers.IO).launch {
                         createParty(userId, partyName)
                         reloadHome()
@@ -137,10 +136,10 @@ fun HomeScreen(userId: String, onNavigate: (Screen) -> Unit, onSetParty: (Party)
             )
         }
         if (showAddFriendDialog) {
-            var showError : String? by remember { mutableStateOf(null) }
+            var showError: String? by remember { mutableStateOf(null) }
             TextFieldDialog(
                 question = "Enter friend name",
-                onAccept = {friendName: String ->
+                onAccept = { friendName: String ->
                     CoroutineScope(Dispatchers.IO).launch {
                         try {
                             addFriend(userId, friendName)
@@ -296,7 +295,7 @@ fun PartiesList(parties: List<Party>?, onButtonClick: () -> Unit, onSetParty: (P
         return
     }
 
-    val listOfParties = parties!!.map { party: Party -> @Composable{ PartyCard(party, onSetParty, onNavigate, onDeleteParty) } }
+    val listOfParties = parties!!.map { party: Party -> @Composable { PartyCard(party, onSetParty, onNavigate, onDeleteParty) } }
     PrettyList("Parties", true, "Create party", onButtonClick, listOfParties)
 }
 
@@ -305,6 +304,6 @@ fun FriendsList(friends: List<Account>?, onButtonClick: () -> Unit, onRemoveFrie
     if (friends == null) {
         return
     }
-    val listOfFriends = friends!!.map { friend: Account -> @Composable{ FriendCard(friend, onRemoveFriend) } }
+    val listOfFriends = friends!!.map { friend: Account -> @Composable { FriendCard(friend, onRemoveFriend) } }
     PrettyList("Friends", true, "Add friend", onButtonClick, listOfFriends)
 }

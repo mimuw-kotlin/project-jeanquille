@@ -6,7 +6,7 @@ import jakarta.persistence.*
 import java.util.*
 
 @Entity
-class Account (
+class Account(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     var id: UUID? = null,
@@ -18,10 +18,10 @@ class Account (
     @ManyToMany
     @JsonIgnore
     var friends: MutableList<Account> = mutableListOf()
-    ) {
+) {
     constructor(username: String, password: String, phoneNumber: String?) : this(
         username = username,
         password = password,
-        phoneNumber = phoneNumber ?: "",
+        phoneNumber = phoneNumber ?: ""
     )
 }

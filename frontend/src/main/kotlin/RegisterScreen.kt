@@ -45,8 +45,9 @@ fun RegisterScreen(onNavigate: (Screen) -> Unit) {
             TextField(
                 value = username,
                 onValueChange = { newValue ->
-                    if (validName(newValue))
+                    if (validName(newValue)) {
                         username = newValue
+                    }
                 },
                 label = { Text("Username") },
                 modifier = Modifier.fillMaxWidth(),
@@ -58,8 +59,9 @@ fun RegisterScreen(onNavigate: (Screen) -> Unit) {
             TextField(
                 value = password,
                 onValueChange = { newValue ->
-                    if (validName(newValue))
+                    if (validName(newValue)) {
                         password = newValue
+                    }
                 },
                 label = { Text("Password") },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -83,8 +85,9 @@ fun RegisterScreen(onNavigate: (Screen) -> Unit) {
             TextField(
                 value = phoneNumber,
                 onValueChange = { newValue ->
-                    if (newValue.all { it.isDigit() })
+                    if (newValue.all { it.isDigit() }) {
                         phoneNumber = newValue
+                    }
                 },
                 label = { Text("Phone number") },
                 modifier = Modifier.fillMaxWidth(),
@@ -96,7 +99,7 @@ fun RegisterScreen(onNavigate: (Screen) -> Unit) {
             Button(
                 onClick = {
                     CoroutineScope(Dispatchers.IO).launch {
-                       responseMessage = registerUser(username, password, phoneNumber)
+                        responseMessage = registerUser(username, password, phoneNumber)
                     }
 //                    onNavigate(Screen.Login)
                 },

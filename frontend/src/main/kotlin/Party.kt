@@ -3,8 +3,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 @Serializable
 data class Party(
@@ -66,7 +64,6 @@ suspend fun addMember(partyId: Long, friendId: String): HttpResponse {
 }
 
 suspend fun addBill(partyId: Long, billName: String, amount: Long, payerId: String, participantsIds: List<String>): HttpResponse {
-
     val body = BillPostBody(billName, payerId, amount, participantsIds)
 
     val response: HttpResponse = client.post("http://localhost:8080/party/$partyId/bill") {

@@ -96,12 +96,15 @@ fun InfoDialog(text: String, onDismiss: () -> Unit) {
         }
     }
 }
+
 @Composable
-fun ListHeader(name: String,
-               showButton: Boolean,
-               buttonDescription: String = "",
-               onButtonClick: () -> Unit = {},
-               buttonIcon: ImageVector) {
+fun ListHeader(
+    name: String,
+    showButton: Boolean,
+    buttonDescription: String = "",
+    onButtonClick: () -> Unit = {},
+    buttonIcon: ImageVector
+) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -146,12 +149,14 @@ fun PrettyListContent(content: List<@Composable () -> Unit>) {
 }
 
 @Composable
-fun PrettyList(name: String,
-               showButton: Boolean,
-               buttonDescription: String = "",
-               onButtonClick: () -> Unit = {},
-               content: List<@Composable () -> Unit>,
-               buttonIcon: ImageVector = Icons.Default.Add) {
+fun PrettyList(
+    name: String,
+    showButton: Boolean,
+    buttonDescription: String = "",
+    onButtonClick: () -> Unit = {},
+    content: List<@Composable () -> Unit>,
+    buttonIcon: ImageVector = Icons.Default.Add
+) {
     Column(
         modifier = Modifier
             .background(MaterialTheme.colors.background, RoundedCornerShape(16.dp))

@@ -7,9 +7,8 @@ import com.jeanquille.billance.services.PartyService
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
-
 @RestController
-class PartyController (private val partyService: PartyService) {
+class PartyController(private val partyService: PartyService) {
 
     @GetMapping("/parties/{accountId}")
     fun getParties(@PathVariable accountId: UUID): List<Party> = partyService.getPartiesByAccountId(accountId)

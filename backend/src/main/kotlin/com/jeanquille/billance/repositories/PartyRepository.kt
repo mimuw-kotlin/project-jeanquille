@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface PartyRepository: JpaRepository<Party, Long> {
+interface PartyRepository : JpaRepository<Party, Long> {
     fun findByMembersAccountId(accountId: UUID): MutableList<Party>
 }

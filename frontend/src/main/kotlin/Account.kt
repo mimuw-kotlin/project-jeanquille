@@ -1,11 +1,9 @@
-import java.util.UUID
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import io.ktor.client.utils.EmptyContent.contentType
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.Serializable
@@ -68,7 +66,7 @@ suspend fun loginUser(username: String, password: String): LoginResult {
             return LoginResult(false, errorMessage = "Login failed: ${response.status}")
         }
     } catch (e: Exception) {
-        return  LoginResult(false, errorMessage = e.message ?: "empty error message")
+        return LoginResult(false, errorMessage = e.message ?: "empty error message")
     }
 }
 

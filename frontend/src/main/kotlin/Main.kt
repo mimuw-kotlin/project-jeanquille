@@ -28,7 +28,7 @@ fun App() {
             primary = Color(0xFF6200EE),
             secondary = Color(0xFF03DAC6),
             secondaryVariant = Color(0xFF87CEEB),
-            background = Color(0xFFBADBED),
+            background = Color(0xFFBADBED)
         )
     ) {
         when (currentScreen) {
@@ -39,15 +39,13 @@ fun App() {
             Screen.Home -> HomeScreen(
                 userId = currentUser,
                 onNavigate = { screen -> currentScreen = screen },
-                onSetParty = { party -> currentParty = party}
+                onSetParty = { party -> currentParty = party }
             )
             Screen.Party -> PartyScreen(currentParty!!, currentUser) { screen -> currentScreen = screen }
             Screen.Register -> RegisterScreen { screen -> currentScreen = screen }
         }
     }
 }
-
-
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "Billance") {

@@ -3,7 +3,7 @@ import io.ktor.client.statement.*
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Member (
+data class Member(
     var id: Long,
     var account: Account,
     var balance: Long
