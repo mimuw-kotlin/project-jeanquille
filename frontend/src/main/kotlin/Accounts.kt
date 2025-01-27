@@ -80,7 +80,14 @@ suspend fun fetchAccount(userId: String): Account {
 }
 
 suspend fun addFriend(userId: String, friendName: String): HttpResponse {
-    val response: HttpResponse = client.post("http://localhost:8080/friends/$userId/add/$friendName")
+    val response: HttpResponse = client.post("http://localhost:8080/friends/$userId/add") {
+        contentType(ContentType.Application.Json)
+        setBody(
+            mapOf(
+                "friendUsername" to friendName
+            )
+        )
+    }
     if (response.status == HttpStatusCode.OK) {
         return response
     } else {
