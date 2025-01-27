@@ -162,3 +162,5 @@ fun PrettyList(name: String,
         PrettyListContent(content)
     }
 }
+
+fun validName(name: String): Boolean = name.all { it.isLetterOrDigit() || it in listOf('-', '_') }

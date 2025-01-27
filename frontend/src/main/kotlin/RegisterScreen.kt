@@ -44,7 +44,10 @@ fun RegisterScreen(onNavigate: (Screen) -> Unit) {
             )
             TextField(
                 value = username,
-                onValueChange = { username = it },
+                onValueChange = { newValue ->
+                    if (validName(newValue))
+                        username = newValue
+                },
                 label = { Text("Username") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
@@ -54,7 +57,10 @@ fun RegisterScreen(onNavigate: (Screen) -> Unit) {
 
             TextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = { newValue ->
+                    if (validName(newValue))
+                        password = newValue
+                },
                 label = { Text("Password") },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
@@ -76,7 +82,10 @@ fun RegisterScreen(onNavigate: (Screen) -> Unit) {
 
             TextField(
                 value = phoneNumber,
-                onValueChange = { phoneNumber = it },
+                onValueChange = { newValue ->
+                    if (newValue.all { it.isDigit() })
+                        phoneNumber = newValue
+                },
                 label = { Text("Phone number") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)

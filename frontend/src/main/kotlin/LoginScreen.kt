@@ -7,6 +7,11 @@ import androidx.compose.material.icons.filled.Face
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -23,6 +28,10 @@ fun LoginScreen(onNavigate: (Screen) -> Unit, onSetUser: (String) -> Unit) {
     var passwordVisible by remember { mutableStateOf(false) }
     var response: LoginResult? by remember { mutableStateOf(null) }
     var isLoading by remember { mutableStateOf(false) }
+
+    val focusRequester1 = remember { FocusRequester() }
+    val focusRequester2 = remember { FocusRequester() }
+    val coroutineScope = rememberCoroutineScope()
 
     Box(
         modifier = Modifier
@@ -47,9 +56,22 @@ fun LoginScreen(onNavigate: (Screen) -> Unit, onSetUser: (String) -> Unit) {
             )
             TextField(
                 value = username,
-                onValueChange = { username = it },
+                onValueChange = { newValue ->
+                    if (validName(newValue))
+                        username = newValue
+                },
                 label = { Text("Username") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .focusRequester(focusRequester1)
+                    .onKeyEvent { keyEvent ->
+                        if (keyEvent.key == Key.Tab) {
+                            coroutineScope.launch { focusRequester2.requestFocus() }
+                            true // Consume the Tab key event
+                        } else {
+                            false
+                        }
+                    }
+                    .fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
 
@@ -57,7 +79,10 @@ fun LoginScreen(onNavigate: (Screen) -> Unit, onSetUser: (String) -> Unit) {
 
             TextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = { newValue ->
+                    if (validName(newValue))
+                        password = newValue
+                },
                 label = { Text("Password") },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
@@ -71,7 +96,23 @@ fun LoginScreen(onNavigate: (Screen) -> Unit, onSetUser: (String) -> Unit) {
                         )
                     }
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .focusRequester(focusRequester2)
+                    .onKeyEvent { keyEvent ->
+                        if (keyEvent.key == Key.Tab) {
+                            coroutineScope.launch { focusRequester1.requestFocus() }
+                            true // Consume the Tab key event
+                        } else if (keyEvent.key == Key.Enter) {
+                            isLoading = true
+                            CoroutineScope(Dispatchers.IO).launch {
+                                response = loginUser(username, password)
+                            }
+                            false
+                        } else {
+                            false
+                        }
+                    }
+                    .fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
             )
 
