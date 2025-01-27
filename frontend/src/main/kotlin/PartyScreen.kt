@@ -226,11 +226,14 @@ fun AddMemberDialog(onDismiss: () -> Unit, party: Party, friends: List<Account>,
                             }
                             onDismiss()
                         }
-                    }
+                    },
+                    enabled = chosenOption != null
                 ) {
                     Text("Confirm")
                 }
-                Button(onClick = onDismiss) {
+                Button(
+                    onClick = onDismiss
+                ) {
                     Text("Cancel")
                 }
                 if (showError) {
