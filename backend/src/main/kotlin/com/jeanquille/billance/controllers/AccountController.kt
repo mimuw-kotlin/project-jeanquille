@@ -15,8 +15,6 @@ import java.util.UUID
 class AccountController(private val accountService: AccountService) {
 
     private val lock = Any()
-    @GetMapping("/accounts")
-    fun getAllAccounts(): MutableList<Account> = accountService.getAllAccounts()
 
     @GetMapping("/account/{accountId}")
     fun getAccount(@PathVariable accountId: UUID): Account = accountService.getAccount(accountId)

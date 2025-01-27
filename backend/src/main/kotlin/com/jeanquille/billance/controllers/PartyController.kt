@@ -17,9 +17,6 @@ class PartyController (private val partyService: PartyService) {
     @GetMapping("/party/{partyId}")
     fun getParty(@PathVariable partyId: Long): Party = partyService.getPartyById(partyId)
 
-    @GetMapping("/parties")
-    fun getAllParties(): List<Party> = partyService.getAllParties()
-
     @DeleteMapping("/party/{partyId}")
     fun deleteParty(@PathVariable partyId: Long) {
         partyService.deleteParty(partyId)
