@@ -163,7 +163,6 @@ class PartyService(
             } else {
                 subRes.add(members[i])
                 j -= members[i].balance.toInt()
-                i -= 1
             }
             i--
         }
